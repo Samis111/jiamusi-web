@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.mapper.ExerciseQuestionsMapper">
+
+    <resultMap id="BaseResultMap" type="com.web.domain.ExerciseQuestions">
+            <id property="questionId" column="question_id" jdbcType="INTEGER"/>
+            <result property="questionContent" column="question_content" jdbcType="VARCHAR"/>
+            <result property="questionTypeId" column="question_type_id" jdbcType="INTEGER"/>
+            <result property="questionCreatorId" column="question_creator_id" jdbcType="INTEGER"/>
+            <result property="questionCreateTime" column="question_create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        question_id,question_content,question_type_id,
+        question_creator_id,question_create_time
+    </sql>
+</mapper>

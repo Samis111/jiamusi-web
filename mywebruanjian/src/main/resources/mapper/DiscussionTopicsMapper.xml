@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.mapper.DiscussionTopicsMapper">
+
+    <resultMap id="BaseResultMap" type="com.web.domain.DiscussionTopics">
+            <id property="topicId" column="topic_id" jdbcType="INTEGER"/>
+            <result property="topicTitle" column="topic_title" jdbcType="VARCHAR"/>
+            <result property="topicCreatorId" column="topic_creator_id" jdbcType="INTEGER"/>
+            <result property="topicCreateTime" column="topic_create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        topic_id,topic_title,topic_creator_id,
+        topic_create_time
+    </sql>
+</mapper>
