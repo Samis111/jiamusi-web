@@ -1,40 +1,30 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input
-        v-model="listQuery.keyword"
-        placeholder="请输入标题关键字"
-        style="width: 200px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
+      <el-input v-model="listQuery.keyword" placeholder="请输入标题关键字" style="width: 200px;" class="filter-item"
+        @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.type" placeholder="选择类型" clearable class="filter-item" style="width: 130px">
-        <el-option label="讨论" value="discussion" />
-        <el-option label="答疑" value="qa" />
+        <el-option label="讨论" value="1" />
+        <el-option label="答疑" value="2" />
       </el-select>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
       <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="handleCreate">
-        {{ listQuery.type === 'qa' ? '新建答疑' : '新建讨论' }}
+        {{ listQuery.type === '1' ? '新建答疑' : '新建讨论' }}
       </el-button>
     </div>
 
-    <el-table
-      :data="list"
-      border
-      style="width: 100%"
-      v-loading="listLoading"
-    >
-      <el-table-column prop="title" label="标题" />
-      <el-table-column prop="content" label="内容" show-overflow-tooltip />
-      <el-table-column prop="creator" label="创建者" />
-      <el-table-column prop="createTime" label="创建时间" width="160" />
-      <el-table-column prop="replyCount" label="回复数" width="80" align="center" />
+    <el-table :data="list" border style="width: 100%" v-loading="listLoading">
+      <el-table-column prop="topicTitle" label="标题" />
+      <el-table-column prop="type" label="类型" show-overflow-tooltip />
+      <el-table-column prop="topicCreatorId" label="创建者" />
+      <el-table-column prop="topicCreateTime" label="创建时间" width="160" />
+      <el-table-column prop="number" label="回复数" width="80" align="center" />
       <el-table-column prop="status" label="状态" width="100">
         <template slot-scope="{row}">
-          <el-tag :type="row.status === 1 ? 'success' : 'info'">
-            {{ row.status === 1 ? '进行中' : '已结束' }}
+          <el-tag :type="row.status === '1' ? 'success' : 'info'">
+            {{ row.status === '1' ? '进行中' : '已结束' }}
           </el-tag>
         </template>
       </el-table-column>
@@ -43,17 +33,13 @@
           <el-button type="text" @click="handleView(row)">查看</el-button>
           <el-button type="text" @click="handleUpdate(row)">编辑</el-button>
           <el-button type="text" @click="handleDelete(row)">删除</el-button>
+          <el-button type="text" @click="handleStateOpen(row)">结束</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
-      @pagination="getList"
-    />
+    <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit"
+      @pagination="getList" />
 
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible">
       <el-form ref="dataForm" :model="temp" label-width="100px" :rules="rules">
@@ -66,7 +52,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+        <el-button type="primary" @click="dialogStatus === 'create' ? createData() : updateData()">
           确认
         </el-button>
       </div>
@@ -94,12 +80,7 @@
           </div>
         </div>
         <div class="reply-form">
-          <el-input
-            type="textarea"
-            v-model="replyContent"
-            :rows="3"
-            placeholder="请输入回复内容"
-          />
+          <el-input type="textarea" v-model="replyContent" :rows="3" placeholder="请输入回复内容" />
           <el-button type="primary" @click="handleReply" style="margin-top: 10px">
             回复
           </el-button>
@@ -155,12 +136,15 @@ export default {
     getList() {
       this.listLoading = true
       getInteractionList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+        this.list = response.data
+    
         this.listLoading = false
       }).catch(() => {
         this.listLoading = false
       })
+    },
+    handleStateOpen(){
+
     },
     handleFilter() {
       this.listQuery.page = 1
@@ -288,4 +272,4 @@ export default {
 .reply-form {
   margin-top: 20px;
 }
-</style> 
+</style>

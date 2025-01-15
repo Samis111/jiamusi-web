@@ -3,32 +3,46 @@ package com.web.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.web.domain.MultimediaCourseware;
 import com.web.domain.PaperQuestionRelation;
+import com.web.domain.UserInfo;
 import com.web.domain.common.Result;
 import com.web.service.MultimediaCoursewareService;
 import com.web.service.PaperQuestionRelationService;
+import com.web.service.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("Multimedia")
+@RequestMapping("courseware")
 public class MultimediaController {
 
 
     @Autowired
     private MultimediaCoursewareService multimediaCoursewareService;
 
+    @Autowired
+    private UserInfoService userInfoService;
 
-    @GetMapping
-    public Result<List<MultimediaCourseware>> list(MultimediaCourseware userInfo) {
+    @GetMapping("list")
+    public Result<List<MultimediaCourseware>> list(MultimediaCourseware multimedia) {
         QueryWrapper<MultimediaCourseware> queryWrapper = new QueryWrapper<>();
 
-//        if (userInfo.getUsername() != null && !userInfo.getUsername().equals("")) {
-//            queryWrapper.eq("username", userInfo.getUsername());
-//        }
+        if (multimedia.getCoursewareTypeId() != null && multimedia.getCoursewareTypeId()!=0) {
+            queryWrapper.eq("courseware_type_id", multimedia.getCoursewareTypeId());
+        }
 
-        List<MultimediaCourseware> list = multimediaCoursewareService.list();
+        if (multimedia.getCoursewareName() != null && !multimedia.getCoursewareName().equals("")) {
+            queryWrapper.like("courseware_name", multimedia.getCoursewareName());
+        }
+
+        List<MultimediaCourseware> list = multimediaCoursewareService.list(queryWrapper);
+        for (MultimediaCourseware multimediaCourseware:list){
+            UserInfo byId = userInfoService.getById(multimediaCourseware.getCoursewareCreatorId());
+            multimediaCourseware.setCreatorName(byId.getUsername());
+        }
+
+
         return Result.ok(list);
     }
 
@@ -54,7 +68,7 @@ public class MultimediaController {
         return Result.ok();
     }
 
-    @PostMapping("removeById/{id}")
+    @DeleteMapping("delete/{id}")
     public Result<?> removeById(@PathVariable Integer id) {
 
         boolean byId = multimediaCoursewareService.removeById(id);

@@ -1,20 +1,11 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input
-        v-model="listQuery.keyword"
-        placeholder="请输入课件名称"
-        style="width: 200px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
-      <el-select v-model="listQuery.type" placeholder="选择类型" clearable class="filter-item" style="width: 130px">
-        <el-option
-          v-for="item in coursewareTypes"
-          :key="item.type_id"
-          :label="item.type_name"
-          :value="item.type_id"
-        />
+      <el-input v-model="listQuery.coursewareName" placeholder="请输入课件名称" style="width: 200px;" class="filter-item"
+        @keyup.enter.native="handleFilter" />
+      <el-select v-model="listQuery.coursewareTypeId" placeholder="选择类型" clearable class="filter-item"
+        style="width: 130px">
+        <el-option v-for="item in coursewareTypes" :key="item.type_id" :label="item.type_name" :value="item.type_id" />
       </el-select>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
@@ -24,16 +15,11 @@
       </el-button>
     </div>
 
-    <el-table
-      :data="list"
-      border
-      style="width: 100%"
-      v-loading="listLoading"
-    >
-      <el-table-column prop="courseware_name" label="课件名称" min-width="200" show-overflow-tooltip />
+    <el-table :data="list" border style="width: 100%" v-loading="listLoading">
+      <el-table-column prop="coursewareName" label="课件名称" min-width="200" show-overflow-tooltip />
       <el-table-column prop="type" label="类型">
         <template slot-scope="{row}">
-          {{ getCoursewareTypeName(row.courseware_type_id) }}
+          {{ getCoursewareTypeName(row.coursewareTypeId) }}
         </template>
       </el-table-column>
       <el-table-column prop="size" label="大小">
@@ -41,52 +27,35 @@
           {{ formatFileSize(row.size) }}
         </template>
       </el-table-column>
-      <el-table-column prop="creator_name" label="上传者" width="120" />
-      <el-table-column prop="create_time" label="上传时间" width="160" />
+      <el-table-column prop="creatorName" label="上传者" width="120" />
+      <el-table-column prop="coursewareCreateTime" label="上传时间" width="160" />
       <el-table-column label="操作" width="200">
         <template slot-scope="{row}">
           <el-button type="text" @click="handleDownload(row)">下载</el-button>
-          <el-button type="text" @click="handlePreview(row)">预览</el-button>
+       
           <el-button type="text" @click="handleDelete(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
-      @pagination="getList"
-    />
+    <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit"
+      @pagination="getList" />
 
     <el-dialog title="上传课件" :visible.sync="uploadVisible">
       <el-form ref="uploadForm" :model="uploadData" :rules="uploadRules" label-width="80px">
-        <el-form-item label="课件名称" prop="name">
-          <el-input v-model="uploadData.name" placeholder="请输入课件名称" />
+        <el-form-item label="课件名称" prop="coursewareName">
+          <el-input v-model="uploadData.coursewareName" placeholder="请输入课件名称" />
         </el-form-item>
-        <el-form-item label="课件类型" prop="type">
-          <el-select v-model="uploadData.type" placeholder="请选择课件类型">
-            <el-option
-              v-for="item in coursewareTypes"
-              :key="item.type_id"
-              :label="item.type_name"
-              :value="item.type_id"
-            />
+        <el-form-item label="课件类型" prop="coursewareTypeId">
+          <el-select v-model="uploadData.coursewareTypeId" placeholder="请选择课件类型">
+            <el-option v-for="item in coursewareTypes" :key="item.type_id" :label="item.type_name"
+              :value="item.type_id" />
           </el-select>
         </el-form-item>
       </el-form>
-      <el-upload
-        class="upload-demo"
-        drag
-        action="/teaching/courseware/upload"
-        :headers="{ Authorization: `Bearer ${this.$store.state.user.token}` }"
-        :data="uploadData"
-        multiple
-        :before-upload="handleBeforeUpload"
-        :on-success="handleUploadSuccess"
-        :on-error="handleUploadError"
-      >
+      <el-upload class="upload-demo" drag action="/api/file/upload"
+        :headers="{ Authorization: `Bearer ${this.$store.state.user.token}` }" :data="uploadData" multiple
+        :before-upload="handleBeforeUpload" :on-success="handleUploadSuccess" :on-error="handleUploadError">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
         <div class="el-upload__tip" slot="tip">支持 PDF、PPT、Word、视频等格式</div>
@@ -103,7 +72,7 @@
 
 <script>
 import Pagination from '@/components/Pagination'
-import { getCoursewareList, uploadCourseware, deleteCourseware } from '@/api/teaching'
+import { getCoursewareList, uploadCourseware, deleteCourseware, addCourseware } from '@/api/teaching'
 import { Message } from 'element-ui'
 
 export default {
@@ -132,8 +101,8 @@ export default {
         { type_id: 4, type_name: '视频文件' }
       ],
       uploadData: {
-        name: '',
-        type: undefined
+        coursewareName: '',
+        coursewareTypeId: undefined
       },
       uploadRules: {
         name: [{ required: true, message: '请输入课件名称', trigger: 'blur' }],
@@ -161,8 +130,8 @@ export default {
     getList() {
       this.listLoading = true
       getCoursewareList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+        this.list = response.data
+
         this.listLoading = false
       }).catch(() => {
         this.listLoading = false
@@ -180,14 +149,12 @@ export default {
       }
     },
     handleDownload(row) {
-      window.open(row.courseware_path)
+      console.log(row)
+      window.open(row.coursewarePath)
     },
-    handlePreview(row) {
-      this.previewUrl = row.courseware_path
-      this.previewVisible = true
-    },
+  
     handleBeforeUpload(file) {
-      if (!this.uploadData.name || !this.uploadData.type) {
+      if (!this.uploadData.coursewareName || !this.uploadData.coursewareTypeId) {
         Message.warning('请先填写课件信息')
         return false
       }
@@ -199,7 +166,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteCourseware(row.id).then(() => {
+        deleteCourseware(row.coursewareId).then(() => {
           Message.success('删除成功')
           this.getList()
         })
@@ -207,8 +174,30 @@ export default {
     },
     handleUploadSuccess(response) {
       Message.success('上传成功')
-      this.uploadVisible = false
-      this.getList()
+
+      let username = window.sessionStorage.getItem('user');
+      console.log(username)
+      // let user = JSON.stringify(username)
+      let user = JSON.parse(username);
+      console.log(user)
+
+
+      // let user = JSON.parse(username);
+      console.log(response.data)
+      let data = {
+        coursewareName: this.uploadData.coursewareName,
+        coursewareTypeId: this.uploadData.coursewareTypeId,
+        coursewarePath: response.data,
+        coursewareCreatorId: user.userId,
+        size: '',
+      };
+
+      addCourseware(data).then(res => {
+        this.uploadVisible = false
+        this.getList()
+      })
+
+
     },
     handleUploadError() {
       Message.error('上传失败')
@@ -220,6 +209,7 @@ export default {
 <style lang="less" scoped>
 .preview-container {
   height: 80vh;
+
   iframe {
     width: 100%;
     height: 100%;
@@ -229,4 +219,4 @@ export default {
 .upload-demo {
   margin-top: 20px;
 }
-</style> 
+</style>

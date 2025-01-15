@@ -1,16 +1,26 @@
 package com.web.controller.img;
 
 
+import com.web.domain.MultimediaCourseware;
 import com.web.domain.common.Result;
 import com.web.domain.common.ResultCodeEnum;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.web.service.MultimediaCoursewareService;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 /**
@@ -23,6 +33,9 @@ public class FileController {
     //	file/upload
 
 //    /file/Adminupload
+
+    @Autowired
+    private MultimediaCoursewareService coursewareService;
 
     /**
      * 上传文件
@@ -72,7 +85,7 @@ public class FileController {
      * @return
      */
     @RequestMapping("/upload")
-    public Result upload(@RequestParam("avatar") MultipartFile file) throws Exception {
+    public Result upload(@RequestParam("file") MultipartFile file) throws Exception {
         if (file.isEmpty()) {
             return Result.build(null, ResultCodeEnum.FILE_TRANSFER);
         }
@@ -107,5 +120,35 @@ public class FileController {
         return Result.ok(str);
     }
 
+
+    @RequestMapping(value = "multimedia/{id}", method = RequestMethod.GET)
+    public void getDownload(@PathVariable("id") Long id, HttpServletRequest request, HttpServletResponse response) {
+
+        MultimediaCourseware byId = coursewareService.getById(id);
+
+        String image = byId.getCoursewarePath().split("image")[1];
+
+        String userDir = System.getProperty("user.dir");
+        String value = "\\src\\main\\resources\\image";
+        String fullPath = userDir + value + image;
+        File downloadFile = new File(fullPath);
+        ServletContext context = request.getServletContext();
+        String mimeType = context.getMimeType(fullPath);
+
+        if (mimeType == null) {
+            mimeType = "application/octet-stream";
+        }
+
+        response.setContentType(mimeType);
+        response.setContentLength((int) downloadFile.length());
+        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", downloadFile.getName()));
+
+        try (InputStream myStream = new FileInputStream(fullPath)) {
+            IOUtils.copy(myStream, response.getOutputStream());
+            response.flushBuffer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

@@ -32,18 +32,26 @@ public class StudentScores implements Serializable {
      */
     private Integer paperId;
 
+
     /**
      * 
      */
-    private BigDecimal totalScore;
+    private Integer totalScore;
 
     /**
      * 
      */
     private Date testTime;
+    @TableField(exist = false)
+    private Integer total;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
+    @TableField(exist = false)
+    private String paperName;
+    @TableField(exist = false)
+    private String studentName;
 
     @Override
     public boolean equals(Object that) {

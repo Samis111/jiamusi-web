@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("userInfo")
+@RequestMapping("user")
 public class UserInfoController {
 
 
@@ -18,15 +18,20 @@ public class UserInfoController {
     private UserInfoService userInfoService;
 
 
-    @GetMapping
+    @GetMapping("list")
     public Result<List<UserInfo>> list(UserInfo userInfo) {
         QueryWrapper<UserInfo> queryWrapper = new QueryWrapper<>();
 
-        if (userInfo.getUsername() != null && !userInfo.getUsername().equals("")) {
-            queryWrapper.eq("username", userInfo.getUsername());
+        if (userInfo.getKeyword() != null && !userInfo.getKeyword().equals("")) {
+            queryWrapper.like("username", userInfo.getKeyword())
+            .or().like("email",userInfo.getKeyword());
         }
 
-        List<UserInfo> list = userInfoService.list();
+        if (userInfo.getRole()!=null && !userInfo.getRole().equals("")){
+            queryWrapper.eq("role",userInfo.getRole());
+        }
+
+        List<UserInfo> list = userInfoService.list(queryWrapper);
         return Result.ok(list);
     }
 
@@ -37,7 +42,7 @@ public class UserInfoController {
         return Result.ok(byId);
     }
 
-    @PostMapping("save")
+    @RequestMapping("create")
     public Result<?> save(@RequestBody UserInfo userInfo) {
 
         boolean save = userInfoService.save(userInfo);
@@ -45,10 +50,29 @@ public class UserInfoController {
     }
 
 
-    @PostMapping("update")
+    @PutMapping("update")
     public Result<?> update(@RequestBody UserInfo userInfo) {
 
         boolean save = userInfoService.updateById(userInfo);
+        return Result.ok();
+    }
+
+    @PutMapping("status/{id}")
+    public Result<?> status(@PathVariable("id")Integer id,@RequestBody UserInfo userInfo){
+
+        userInfo.setUserId(id);
+
+        userInfoService.updateById(userInfo);
+        return Result.ok();
+    }
+
+    @PutMapping("reset-password/{id}")
+    public Result<?> resetPassword(@PathVariable("id")Integer id){
+
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserId(id);
+        userInfo.setPassword("123456");
+        userInfoService.updateById(userInfo);
         return Result.ok();
     }
 

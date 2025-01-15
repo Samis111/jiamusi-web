@@ -3,24 +3,31 @@ package com.web.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.web.domain.StudentScores;
 import com.web.domain.TestPapers;
+import com.web.domain.UserInfo;
 import com.web.domain.common.Result;
 import com.web.service.StudentScoresService;
 import com.web.service.TestPapersService;
+import com.web.service.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("StudentScores")
+@RequestMapping("score")
 public class StudentScoresController {
 
 
     @Autowired
     private StudentScoresService studentScoresService;
 
+    @Autowired
+    private UserInfoService userInfoService;
 
-    @GetMapping
+    @Autowired
+    private TestPapersService testPapersService;
+
+    @GetMapping("list")
     public Result<List<StudentScores>> list(StudentScores userInfo) {
         QueryWrapper<StudentScores> queryWrapper = new QueryWrapper<>();
 
@@ -29,6 +36,22 @@ public class StudentScoresController {
 //        }
 
         List<StudentScores> list = studentScoresService.list();
+
+        for (StudentScores scores : list) {
+
+            try {
+                UserInfo userInfoServiceById = userInfoService.getById(scores.getStudentId());
+                TestPapers testPapersServiceById = testPapersService.getById(scores.getPaperId());
+
+                scores.setStudentName(userInfoServiceById.getUsername());
+                scores.setPaperName(testPapersServiceById.getPaperName());
+                scores.setTotal(testPapersServiceById.getTotalScore());
+
+            } catch (Exception e) {
+            }
+        }
+
+
         return Result.ok(list);
     }
 

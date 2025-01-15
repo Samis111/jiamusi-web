@@ -16,7 +16,7 @@ const routes = [
     redirect: '/teaching/interaction',
     children: [
       {
-        path: 'teaching',
+        path: '/teaching',
         component: { render: h => h('router-view') },
         children: [
           {
@@ -77,10 +77,10 @@ router.beforeEach((to, from, next) => {
   }
   
   // 如果没有token，重定向到登录页
-  if (!token) {
-    next('/login')
-    return
-  }
+  // if (!token) {
+  //   next('/login')
+  //   return
+  // }
   
   // 有token，放行
   next()

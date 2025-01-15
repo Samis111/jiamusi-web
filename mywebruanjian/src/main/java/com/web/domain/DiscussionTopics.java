@@ -4,38 +4,48 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+
 import java.io.Serializable;
 import java.util.Date;
+
 import lombok.Data;
 
 /**
- * 
  * @TableName discussion_topics
  */
-@TableName(value ="discussion_topics")
+@TableName(value = "discussion_topics")
 @Data
 public class DiscussionTopics implements Serializable {
     /**
-     * 
+     *
      */
     @TableId(type = IdType.AUTO)
     private Integer topicId;
 
     /**
-     * 
+     *
      */
     private String topicTitle;
 
     /**
-     * 
+     *
      */
     private Integer topicCreatorId;
 
     /**
-     * 
+     *
      */
     private Date topicCreateTime;
 
+    private Integer number;
+    private String status;
+
+
+    @TableField(exist = false)
+    private String keyword;
+
+    @TableField(exist = false)
+    private String type;
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
@@ -52,9 +62,9 @@ public class DiscussionTopics implements Serializable {
         }
         DiscussionTopics other = (DiscussionTopics) that;
         return (this.getTopicId() == null ? other.getTopicId() == null : this.getTopicId().equals(other.getTopicId()))
-            && (this.getTopicTitle() == null ? other.getTopicTitle() == null : this.getTopicTitle().equals(other.getTopicTitle()))
-            && (this.getTopicCreatorId() == null ? other.getTopicCreatorId() == null : this.getTopicCreatorId().equals(other.getTopicCreatorId()))
-            && (this.getTopicCreateTime() == null ? other.getTopicCreateTime() == null : this.getTopicCreateTime().equals(other.getTopicCreateTime()));
+                && (this.getTopicTitle() == null ? other.getTopicTitle() == null : this.getTopicTitle().equals(other.getTopicTitle()))
+                && (this.getTopicCreatorId() == null ? other.getTopicCreatorId() == null : this.getTopicCreatorId().equals(other.getTopicCreatorId()))
+                && (this.getTopicCreateTime() == null ? other.getTopicCreateTime() == null : this.getTopicCreateTime().equals(other.getTopicCreateTime()));
     }
 
     @Override

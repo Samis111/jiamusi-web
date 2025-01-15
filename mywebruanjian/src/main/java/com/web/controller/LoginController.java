@@ -43,5 +43,9 @@ public class LoginController {
 
     }
 
+    @PostMapping("logout")
+    public Result logout() {
 
+            return Result.ok();
+    }
 }

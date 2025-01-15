@@ -41,10 +41,17 @@ public class MultimediaCourseware implements Serializable {
      */
     private Integer coursewareCreatorId;
 
+    @TableField(exist = false)
+    private String creatorName;
+
     /**
      * 
      */
     private Date coursewareCreateTime;
+
+
+
+    private String size;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

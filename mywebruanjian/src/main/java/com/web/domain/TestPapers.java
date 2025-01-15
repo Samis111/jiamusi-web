@@ -36,6 +36,13 @@ public class TestPapers implements Serializable {
      */
     private Date paperCreateTime;
 
+    private Date starttime;
+    private Date endtime;
+
+    private Integer status;
+
+    private Integer totalScore;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 

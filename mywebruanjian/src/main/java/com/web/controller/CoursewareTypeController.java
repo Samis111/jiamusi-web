@@ -21,7 +21,7 @@ public class CoursewareTypeController {
 
 
     @GetMapping
-    public Result<List<CoursewareType>> list(CoursewareType userInfo) {
+    public Result<List<CoursewareType>> list(CoursewareType coursewareType) {
         QueryWrapper<CoursewareType> queryWrapper = new QueryWrapper<>();
 
 //        if (userInfo.getUsername() != null && !userInfo.getUsername().equals("")) {

@@ -1,28 +1,13 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input
-        v-model="listQuery.keyword"
-        placeholder="请输入学生姓名"
-        style="width: 200px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
+      <el-input v-model="listQuery.keyword" placeholder="请输入学生姓名" style="width: 200px;" class="filter-item"
+        @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.paper_id" placeholder="选择试卷" clearable class="filter-item" style="width: 200px">
-        <el-option
-          v-for="item in papers"
-          :key="item.paper_id"
-          :label="item.paper_name"
-          :value="item.paper_id"
-        />
+        <el-option v-for="item in papers" :key="item.paper_id" :label="item.paper_name" :value="item.paper_id" />
       </el-select>
       <el-select v-model="listQuery.type" placeholder="选择题目类型" clearable class="filter-item" style="width: 130px">
-        <el-option
-          v-for="item in exerciseTypes"
-          :key="item.type_id"
-          :label="item.type_name"
-          :value="item.type_id"
-        />
+        <el-option v-for="item in exerciseTypes" :key="item.type_id" :label="item.type_name" :value="item.type_id" />
       </el-select>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
@@ -34,23 +19,18 @@
 
     <el-tabs v-model="activeTab" @tab-click="handleTabClick">
       <el-tab-pane label="成绩列表" name="list">
-        <el-table
-          :data="list"
-          border
-          style="width: 100%"
-          v-loading="listLoading"
-        >
-          <el-table-column prop="student_name" label="学生姓名" width="120" />
-          <el-table-column prop="student_id" label="学号" width="120" />
-          <el-table-column prop="paper_name" label="试卷名称" min-width="200" show-overflow-tooltip />
+        <el-table :data="list" border style="width: 100%" v-loading="listLoading">
+          <el-table-column prop="studentName" label="学生姓名" width="120" />
+          <el-table-column prop="studentId" label="学号" width="120" />
+          <el-table-column prop="paperName" label="试卷名称" min-width="200" show-overflow-tooltip />
           <el-table-column prop="type" label="题目类型" width="120">
             <template slot-scope="{row}">
               {{ getExerciseTypeName(row.type_id) }}
             </template>
           </el-table-column>
-          <el-table-column prop="score" label="得分" width="100" align="center" />
-          <el-table-column prop="total_score" label="总分" width="100" align="center" />
-          <el-table-column prop="test_time" label="考试时间" width="160" />
+          <el-table-column prop="totalScore" label="得分" width="100" align="center" />
+          <el-table-column prop="total" label="总分" width="100" align="center" />
+          <el-table-column prop="testTime" label="考试时间" width="160" />
           <el-table-column label="操作" width="150">
             <template slot-scope="{row}">
               <el-button type="text" @click="handleDetail(row)">查看详情</el-button>
@@ -58,13 +38,8 @@
           </el-table-column>
         </el-table>
 
-        <pagination
-          v-show="total>0"
-          :total="total"
-          :page.sync="listQuery.page"
-          :limit.sync="listQuery.limit"
-          @pagination="getList"
-        />
+        <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit"
+          @pagination="getList" />
       </el-tab-pane>
 
       <el-tab-pane label="成绩统计" name="stats">
@@ -76,19 +51,10 @@
             <el-card class="box-card">
               <div slot="header" class="clearfix">
                 <span>统计信息</span>
-                <el-select 
-                  v-model="statsQuery.paper_id" 
-                  placeholder="选择试卷" 
-                  size="small" 
-                  style="float: right; width: 200px"
-                  @change="handleStatsChange"
-                >
-                  <el-option
-                    v-for="item in papers"
-                    :key="item.paper_id"
-                    :label="item.paper_name"
-                    :value="item.paper_id"
-                  />
+                <el-select v-model="statsQuery.paper_id" placeholder="选择试卷" size="small"
+                  style="float: right; width: 200px" @change="handleStatsChange">
+                  <el-option v-for="item in papers" :key="item.paper_id" :label="item.paper_name"
+                    :value="item.paper_id" />
                 </el-select>
               </div>
               <div class="stats-item">
@@ -145,12 +111,12 @@
 
 <script>
 import Pagination from '@/components/Pagination'
-import { 
-  getScoreList, 
-  getScoreDetail, 
-  getScoreStats, 
+import {
+  getScoreList,
+  getScoreDetail,
+  getScoreStats,
   exportScore,
-  getPaperList 
+  getPaperList
 } from '@/api/teaching'
 import { Message } from 'element-ui'
 import * as echarts from 'echarts'
@@ -209,9 +175,11 @@ export default {
     },
     getList() {
       this.listLoading = true
-      getScoreList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+      getScoreList(this.listQuery).then(res => {
+
+        console.log(res)
+
+        this.list = res.data
         this.listLoading = false
       }).catch(() => {
         this.listLoading = false
@@ -281,6 +249,7 @@ export default {
 
   .chart-wrapper {
     flex: 1;
+
     .chart {
       width: 100%;
       height: 400px;
@@ -293,11 +262,11 @@ export default {
 
     .stats-item {
       margin-bottom: 15px;
-      
+
       .label {
         color: #606266;
       }
-      
+
       .value {
         margin-left: 10px;
         font-weight: bold;
@@ -332,7 +301,7 @@ export default {
 
     .question-content {
       margin-bottom: 10px;
-      
+
       .question-no {
         font-weight: bold;
       }
@@ -340,7 +309,7 @@ export default {
 
     .answer-info {
       color: #606266;
-      
+
       p {
         margin: 5px 0;
       }
@@ -351,4 +320,4 @@ export default {
 .filter-item {
   margin-right: 10px;
 }
-</style> 
+</style>

@@ -1,21 +1,9 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input
-        v-model="listQuery.keyword"
-        placeholder="请输入试卷名称"
-        style="width: 200px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
-      <el-select v-model="listQuery.type" placeholder="选择题目类型" clearable class="filter-item" style="width: 130px">
-        <el-option
-          v-for="item in exerciseTypes"
-          :key="item.type_id"
-          :label="item.type_name"
-          :value="item.type_id"
-        />
-      </el-select>
+      <el-input v-model="listQuery.paperName" placeholder="请输入试卷名称" style="width: 200px;" class="filter-item"
+        @keyup.enter.native="handleFilter" />
+
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
@@ -24,24 +12,20 @@
       </el-button>
     </div>
 
-    <el-table
-      :data="list"
-      border
-      style="width: 100%"
-      v-loading="listLoading"
-    >
-      <el-table-column prop="paper_name" label="试卷名称" min-width="200" show-overflow-tooltip />
+    <el-table :data="list" border style="width: 100%" v-loading="listLoading">
+      <el-table-column prop="paperName" label="试卷名称" min-width="200" show-overflow-tooltip />
       <el-table-column prop="type" label="题目类型" width="120">
         <template slot-scope="{row}">
           {{ getExerciseTypeName(row.type_id) }}
         </template>
       </el-table-column>
-      <el-table-column prop="startTime" label="开始时间" />
-      <el-table-column prop="duration" label="考试时长">
+      <el-table-column prop="starttime" label="开始时间" />
+      <el-table-column prop="endtime" label="结束时间" />
+      <!-- <el-table-column prop="duration" label="考试时长">
         <template slot-scope="{row}">
           {{ row.duration }}分钟
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column prop="status" label="状态">
         <template slot-scope="{row}">
           <el-tag :type="getStatusType(row.status)">
@@ -49,7 +33,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="total_score" label="总分" width="80" align="center" />
+      <el-table-column prop="totalScore" label="总分" width="80" align="center" />
       <el-table-column label="操作" width="250" fixed="right">
         <template slot-scope="{row}">
           <el-button type="text" @click="handleEdit(row)">编辑</el-button>
@@ -60,79 +44,52 @@
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
-      @pagination="getList"
-    />
+    <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit"
+      @pagination="getList" />
 
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="60%">
       <el-form ref="dataForm" :model="temp" label-width="100px">
-        <el-form-item label="试卷名称" prop="paper_name">
-          <el-input v-model="temp.paper_name" />
+        <el-form-item label="试卷名称" prop="paperName">
+          <el-input v-model="temp.paperName" />
         </el-form-item>
         <el-form-item label="题目类型" prop="type">
           <el-select v-model="temp.type" placeholder="请选择题目类型">
-            <el-option
-              v-for="item in exerciseTypes"
-              :key="item.type_id"
-              :label="item.type_name"
-              :value="item.type_id"
-            />
+            <el-option v-for="item in exerciseTypes" :key="item.type_id" :label="item.type_name"
+              :value="item.type_id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="开始时间" prop="startTime">
-          <el-date-picker
-            v-model="temp.startTime"
-            type="datetime"
-            placeholder="选择开始时间"
-          />
+        <el-form-item label="开始时间" prop="starttime">
+          <el-date-picker v-model="temp.starttime" type="datetime" placeholder="选择开始时间" />
         </el-form-item>
-        <el-form-item label="考试时长" prop="duration">
+        <el-form-item label="结束时间" prop="endtime">
+          <el-date-picker v-model="temp.endtime" type="datetime" placeholder="选择开始时间" />
+        </el-form-item>
+        <!-- <el-form-item label="考试时长" prop="duration">
           <el-input-number v-model="temp.duration" :min="30" :step="30" />
           <span class="unit">分钟</span>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="题目列表">
           <div v-for="(question, index) in temp.questions" :key="index" class="question-item">
-            <el-input
-              type="textarea"
-              v-model="question.content"
-              :rows="2"
-              placeholder="请输入题目内容"
-            />
+            <el-input type="textarea" v-model="question.content" :rows="2" placeholder="请输入题目内容" />
             <div class="options" v-if="temp.type === 1">
-              <el-input
-                v-for="(option, idx) in question.options"
-                :key="idx"
-                v-model="question.options[idx]"
-                placeholder="选项内容"
-              />
+              <el-input v-for="(option, idx) in question.options" :key="idx" v-model="question.options[idx]"
+                placeholder="选项内容" />
             </div>
-            <el-input
-              v-model="question.answer"
-              :type="temp.type === 1 ? 'text' : 'textarea'"
-              :rows="temp.type === 1 ? 1 : 3"
-              placeholder="正确答案"
-            />
+            <el-input v-model="question.answer" :type="temp.type === 1 ? 'text' : 'textarea'"
+              :rows="temp.type === 1 ? 1 : 3" placeholder="正确答案" />
             <div class="question-footer">
-              <el-input-number
-                v-model="question.score"
-                :min="1"
-                :max="100"
-                size="small"
-                placeholder="分值"
-              />
+              <el-input-number v-model="question.score" :min="1" :max="100" size="small" placeholder="分值" />
               <el-button type="danger" size="small" @click="removeQuestion(index)">删除题目</el-button>
             </div>
           </div>
-          <el-button type="primary" @click="addQuestion">添加题目</el-button>
+          <el-button type="primary" @click="addQuestion">选择题目</el-button>
         </el-form-item>
+
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+        <el-button type="primary" @click="dialogStatus === 'create' ? createData() : updateData()">
           确认
         </el-button>
       </div>
@@ -175,13 +132,14 @@
 
 <script>
 import Pagination from '@/components/Pagination'
-import { 
-  getTestList, 
-  createTest, 
-  updateTest, 
+import {
+  getTestList,
+  createTest,
+  updateTest,
   deleteTest,
   getTestResults,
-  getAnswerDetail 
+  getAnswerDetail,
+  getExerciseList
 } from '@/api/teaching'
 import { Message } from 'element-ui'
 
@@ -215,13 +173,15 @@ export default {
       answerDetail: null,
       temp: {
         id: undefined,
-        paper_name: '',
+        paperName: '',
         type: undefined,
-        startTime: '',
+        starttime: '',
+        endtime: '',
         duration: 90,
         questions: [],
         status: 0
       },
+      questions: [],
       rules: {
         paper_name: [{ required: true, message: '请输入试卷名称', trigger: 'blur' }],
         type: [{ required: true, message: '请选择题目类型', trigger: 'change' }],
@@ -232,11 +192,19 @@ export default {
   },
   created() {
     this.getList()
+    this.infoExercis()
   },
   methods: {
     getExerciseTypeName(typeId) {
       const type = this.exerciseTypes.find(t => t.type_id === typeId)
       return type ? type.type_name : '未知'
+    },
+    infoExercis() {
+
+      getExerciseList().then(res => {
+        this.questions = res.data;
+      })
+
     },
     getStatusType(status) {
       const statusMap = {
@@ -257,8 +225,8 @@ export default {
     getList() {
       this.listLoading = true
       getTestList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+        this.list = response.data
+
         this.listLoading = false
       }).catch(() => {
         this.listLoading = false
@@ -365,12 +333,12 @@ export default {
 
   .options {
     margin: 10px 0;
-    
+
     .el-input {
       margin-bottom: 10px;
       width: calc(50% - 10px);
       margin-right: 20px;
-      
+
       &:nth-child(2n) {
         margin-right: 0;
       }
@@ -403,7 +371,7 @@ export default {
 
     .question-content {
       margin-bottom: 10px;
-      
+
       .question-no {
         font-weight: bold;
       }
@@ -411,11 +379,11 @@ export default {
 
     .answer-info {
       color: #606266;
-      
+
       p {
         margin: 5px 0;
       }
     }
   }
 }
-</style> 
+</style>

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("DiscussionTopics")
+@RequestMapping("interaction")
 public class DiscussionTopicsController {
 
 
@@ -21,15 +21,15 @@ public class DiscussionTopicsController {
     private DiscussionTopicsService discussionTopicsService;
 
 
-    @GetMapping
-    public Result<List<DiscussionTopics>> list(ExerciseType userInfo) {
+    @GetMapping("list")
+    public Result<List<DiscussionTopics>> list(DiscussionTopics userInfo) {
         QueryWrapper<DiscussionTopics> queryWrapper = new QueryWrapper<>();
 
-//        if (userInfo.getUsername() != null && !userInfo.getUsername().equals("")) {
-//            queryWrapper.eq("username", userInfo.getUsername());
-//        }
+        if (userInfo.getTopicCreatorId() != null && userInfo.getTopicCreatorId()!=0) {
+            queryWrapper.eq("reply_creator_id", userInfo.getTopicCreatorId());
+        }
 
-        List<DiscussionTopics> list = discussionTopicsService.list();
+        List<DiscussionTopics> list = discussionTopicsService.list(queryWrapper);
         return Result.ok(list);
     }
 
@@ -55,7 +55,7 @@ public class DiscussionTopicsController {
         return Result.ok();
     }
 
-    @PostMapping("removeById/{id}")
+    @PostMapping("delete/{id}")
     public Result<?> removeById(@PathVariable Integer id) {
 
         boolean byId = discussionTopicsService.removeById(id);

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("TestPaper")
+@RequestMapping("test")
 public class TestPapersController {
 
 
@@ -20,15 +20,15 @@ public class TestPapersController {
     private TestPapersService testPapersService;
 
 
-    @GetMapping
-    public Result<List<TestPapers>> list(TestPapers userInfo) {
+    @GetMapping("list")
+    public Result<List<TestPapers>> list(TestPapers testPapers) {
         QueryWrapper<TestPapers> queryWrapper = new QueryWrapper<>();
 
-//        if (userInfo.getUsername() != null && !userInfo.getUsername().equals("")) {
-//            queryWrapper.eq("username", userInfo.getUsername());
-//        }
+        if (testPapers.getPaperName() != null && !testPapers.getPaperName().equals("")) {
+            queryWrapper.eq("paper_name", testPapers.getPaperName());
+        }
 
-        List<TestPapers> list = testPapersService.list();
+        List<TestPapers> list = testPapersService.list(queryWrapper);
         return Result.ok(list);
     }
 

@@ -52,6 +52,15 @@ export function uploadCourseware(data) {
   })
 }
 
+export function addCourseware(data) {
+  return request({
+    url: '/courseware/save',
+    method: 'post',
+    data,
+  })
+}
+
+
 export function deleteCourseware(id) {
   return request({
     url: `/courseware/delete/${id}`,

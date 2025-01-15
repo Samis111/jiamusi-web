@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.util.Date;
+
 import lombok.Data;
 
 /**
@@ -39,6 +41,13 @@ public class UserInfo implements Serializable {
      * 
      */
     private String email;
+
+    private Date createTime;
+
+    private Integer status;
+
+    @TableField(exist = false)
+    private String keyword;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

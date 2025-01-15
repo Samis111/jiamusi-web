@@ -1,13 +1,7 @@
 <template>
   <div class="login-container">
-    <el-form
-      ref="loginForm"
-      :model="loginForm"
-      :rules="loginRules"
-      class="login-form"
-      autocomplete="on"
-      label-position="left"
-    >
+    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on"
+      label-position="left">
       <div class="title-container">
         <h3 class="title">教学管理系统</h3>
       </div>
@@ -16,41 +10,23 @@
         <span class="svg-container">
           <i class="el-icon-user" />
         </span>
-        <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="用户名"
-          name="username"
-          type="text"
-          autocomplete="on"
-        />
+        <el-input ref="username" v-model="loginForm.username" placeholder="用户名" name="username" type="text"
+          autocomplete="on" />
       </el-form-item>
 
       <el-form-item prop="password">
         <span class="svg-container">
           <i class="el-icon-lock" />
         </span>
-        <el-input
-          :key="passwordType"
-          ref="password"
-          v-model="loginForm.password"
-          :type="passwordType"
-          placeholder="密码"
-          name="password"
-          autocomplete="on"
-          @keyup.enter.native="handleLogin"
-        />
+        <el-input :key="passwordType" ref="password" v-model="loginForm.password" :type="passwordType" placeholder="密码"
+          name="password" autocomplete="on" @keyup.enter.native="handleLogin" />
         <span class="show-pwd" @click="showPwd">
           <i :class="passwordType === 'password' ? 'el-icon-view' : 'el-icon-hide'" />
         </span>
       </el-form-item>
 
-      <el-button
-        :loading="loading"
-        type="primary"
-        style="width:100%;margin-bottom:30px;"
-        @click.native.prevent="handleLogin"
-      >
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;"
+        @click.native.prevent="handleLogin">
         登录
       </el-button>
     </el-form>
@@ -58,6 +34,9 @@
 </template>
 
 <script>
+
+import { login } from '@/api/user.js'
+
 export default {
   name: 'Login',
   data() {
@@ -91,7 +70,7 @@ export default {
   },
   watch: {
     $route: {
-      handler: function(route) {
+      handler: function (route) {
         this.redirect = route.query && route.query.redirect
       },
       immediate: true
@@ -108,14 +87,17 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm)
-            .then(() => {
-              this.$router.push({ path: this.redirect || '/' })
-              this.loading = false
-            })
-            .catch(() => {
-              this.loading = false
-            })
+
+          login(this.loginForm).then(res => {
+            console.log(res.data);
+            this.$router.push({ path: this.redirect || '/' })
+            let userString = JSON.stringify(res.data);
+            window.sessionStorage.setItem('user', userString)
+            this.loading = false
+          }).catch(() => {
+            this.loading = false
+          })
+
         } else {
           return false
         }
@@ -154,14 +136,15 @@ export default {
     overflow: hidden;
     background: #fff;
     border-radius: 4px;
-    box-shadow: 0 0 10px rgba(0,0,0,.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
   }
 
   .title-container {
     position: relative;
+
     .title {
       font-size: 26px;
-      color: rgba(0,0,0,.85);
+      color: rgba(0, 0, 0, .85);
       margin: 0 auto 40px auto;
       text-align: center;
       font-weight: bold;
@@ -185,4 +168,4 @@ export default {
     user-select: none;
   }
 }
-</style> 
+</style>

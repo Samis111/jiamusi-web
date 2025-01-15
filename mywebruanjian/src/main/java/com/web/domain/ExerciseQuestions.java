@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
 
 /**
@@ -41,8 +43,15 @@ public class ExerciseQuestions implements Serializable {
      */
     private Date questionCreateTime;
 
+    private Integer status;
+
+    private Integer questionCount;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
+
+    private String questionAnswer;
 
     @Override
     public boolean equals(Object that) {

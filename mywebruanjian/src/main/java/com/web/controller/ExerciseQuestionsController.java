@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("ExerciseQuestions")
+@RequestMapping("exercise")
 public class ExerciseQuestionsController {
 
 
@@ -20,15 +20,19 @@ public class ExerciseQuestionsController {
     private ExerciseQuestionsService exerciseQuestionsService;
 
 
-    @GetMapping
-    public Result<List<ExerciseQuestions>> list(ExerciseType userInfo) {
+    @GetMapping("list")
+    public Result<List<ExerciseQuestions>> list(ExerciseQuestions exerciseQuestions) {
         QueryWrapper<ExerciseQuestions> queryWrapper = new QueryWrapper<>();
 
-//        if (userInfo.getUsername() != null && !userInfo.getUsername().equals("")) {
-//            queryWrapper.eq("username", userInfo.getUsername());
-//        }
+        if (exerciseQuestions.getQuestionContent() != null && !exerciseQuestions.getQuestionContent().equals("")) {
+            queryWrapper.like("question_content", exerciseQuestions.getQuestionContent());
+        }
 
-        List<ExerciseQuestions> list = exerciseQuestionsService.list();
+        if (exerciseQuestions.getQuestionTypeId() != null && exerciseQuestions.getQuestionTypeId() != 0) {
+            queryWrapper.eq("question_type_id", exerciseQuestions.getQuestionTypeId());
+        }
+        queryWrapper.eq("status", "1");
+        List<ExerciseQuestions> list = exerciseQuestionsService.list(queryWrapper);
         return Result.ok(list);
     }
 
@@ -39,13 +43,28 @@ public class ExerciseQuestionsController {
         return Result.ok(byId);
     }
 
-    @PostMapping("save")
-    public Result<?> save(@RequestBody ExerciseQuestions userInfo) {
+    @PostMapping("create")
+    public Result<?> save(@RequestBody ExerciseQuestions exerciseQuestions) {
 
-        boolean save = exerciseQuestionsService.save(userInfo);
+        boolean save = exerciseQuestionsService.save(exerciseQuestions);
         return Result.ok();
     }
 
+    @PutMapping("publish/{id}")
+    public Result<?> publish(@PathVariable("id") Integer id) {
+
+        ExerciseQuestions byId = exerciseQuestionsService.getById(id);
+
+        if (byId.getStatus() == 0) {
+            byId.setStatus(1);
+            exerciseQuestionsService.updateById(byId);
+        } else if (byId.getStatus() == 1) {
+            byId.setStatus(0);
+            exerciseQuestionsService.updateById(byId);
+        }
+
+        return Result.ok();
+    }
 
     @PostMapping("update")
     public Result<?> update(@RequestBody ExerciseQuestions userInfo) {
@@ -54,7 +73,7 @@ public class ExerciseQuestionsController {
         return Result.ok();
     }
 
-    @PostMapping("removeById/{id}")
+    @DeleteMapping("delete/{id}")
     public Result<?> removeById(@PathVariable Integer id) {
 
         boolean byId = exerciseQuestionsService.removeById(id);
