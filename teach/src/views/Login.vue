@@ -25,6 +25,13 @@
         </span>
       </el-form-item>
 
+      <el-form-item prop="role">
+        <el-radio-group v-model="loginForm.role" size="medium">
+          <el-radio label="student">学生</el-radio>
+          <el-radio label="teacher">教师</el-radio>
+        </el-radio-group>
+      </el-form-item>
+
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;"
         @click.native.prevent="handleLogin">
         登录
@@ -34,8 +41,7 @@
 </template>
 
 <script>
-
-import { login } from '@/api/user.js'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'Login',
@@ -54,14 +60,23 @@ export default {
         callback()
       }
     }
+    const validateRole = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请选择角色'))
+      } else {
+        callback()
+      }
+    }
     return {
       loginForm: {
         username: '',
-        password: ''
+        password: '',
+        role: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        role: [{ required: true, trigger: 'change', validator: validateRole }]
       },
       passwordType: 'password',
       loading: false,
@@ -77,6 +92,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions('user', ['login']),
     showPwd() {
       this.passwordType = this.passwordType === 'password' ? '' : 'password'
       this.$nextTick(() => {
@@ -87,19 +103,17 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-
-          login(this.loginForm).then(res => {
-            console.log(res.data);
-            this.$router.push({ path: this.redirect || '/' })
-            let userString = JSON.stringify(res.data);
-            window.sessionStorage.setItem('user', userString)
-            this.loading = false
-          }).catch(() => {
-            this.loading = false
-          })
-
-        } else {
-          return false
+          this.login(this.loginForm)
+            .then(() => {
+              this.loading = false
+              // 根据角色跳转到不同的首页
+              const { role } = this.loginForm
+              const path = role === 'student' ? '/student/exercise' : '/teaching/interaction'
+              this.$router.push({ path: this.redirect || path })
+            })
+            .catch(() => {
+              this.loading = false
+            })
         }
       })
     }
@@ -166,6 +180,23 @@ export default {
     color: #889aa4;
     cursor: pointer;
     user-select: none;
+  }
+
+  .el-form-item {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    color: #454545;
+
+    &:last-child {
+      border: none;
+      background: none;
+    }
+  }
+
+  .el-radio-group {
+    width: 100%;
+    text-align: center;
   }
 }
 </style>

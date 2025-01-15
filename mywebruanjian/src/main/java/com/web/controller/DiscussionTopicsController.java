@@ -2,11 +2,9 @@ package com.web.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.web.domain.DiscussionTopics;
-import com.web.domain.ExerciseQuestions;
-import com.web.domain.ExerciseType;
+
 import com.web.domain.common.Result;
 import com.web.service.DiscussionTopicsService;
-import com.web.service.ExerciseQuestionsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

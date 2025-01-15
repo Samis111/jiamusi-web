@@ -58,6 +58,37 @@ const routes = [
         ]
       }
     ]
+  },
+  {
+    path: '/student',
+    component: Layout,
+    redirect: '/student/exercise',
+    children: [
+      {
+        path: 'exercise',
+        name: 'StudentExercise',
+        component: () => import('@/views/student/Exercise'),
+        meta: { title: '在线练习' }
+      },
+      {
+        path: 'test',
+        name: 'StudentTest',
+        component: () => import('@/views/student/Test'),
+        meta: { title: '在线测试' }
+      },
+      {
+        path: 'score',
+        name: 'StudentScore', 
+        component: () => import('@/views/student/Score'),
+        meta: { title: '我的成绩' }
+      },
+      {
+        path: 'interaction',
+        name: 'StudentInteraction',
+        component: () => import('@/views/student/Interaction'),
+        meta: { title: '教学互动' }
+      }
+    ]
   }
 ]
 
@@ -67,8 +98,8 @@ const router = new VueRouter({
 
 // 路由守卫
 router.beforeEach((to, from, next) => {
-  // 获取token
-  const token = localStorage.getItem('token')
+  // 获取用户信息
+  const userInfo = router.app.$store?.state.user.userInfo
   
   // 如果访问登录页，直接放行
   if (to.path === '/login') {
@@ -76,13 +107,25 @@ router.beforeEach((to, from, next) => {
     return
   }
   
-  // 如果没有token，重定向到登录页
-  // if (!token) {
-  //   next('/login')
-  //   return
-  // }
+  // 如果没有角色信息，重定向到登录页
+  if (!userInfo?.role) {
+    next('/login')
+    return
+  }
   
-  // 有token，放行
+  // 根据角色判断可访问的路由
+  const { role } = userInfo
+  if (role === 'student' && to.path.startsWith('/teaching')) {
+    next('/student/exercise')
+    return
+  }
+  
+  if (role === 'teacher' && to.path.startsWith('/student')) {
+    next('/teaching/interaction')
+    return
+  }
+  
+  // 放行
   next()
 })
 

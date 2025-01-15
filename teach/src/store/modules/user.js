@@ -2,7 +2,10 @@ import { login, logout } from '@/api/user'
 
 const state = {
   token: localStorage.getItem('token'),
-  userInfo: JSON.parse(localStorage.getItem('userInfo') || '{}')
+  userInfo: {
+    role: '',
+    username: ''
+  }
 }
 
 const mutations = {
@@ -12,25 +15,27 @@ const mutations = {
   },
   SET_USER_INFO: (state, userInfo) => {
     state.userInfo = userInfo
-    localStorage.setItem('userInfo', JSON.stringify(userInfo))
   },
   CLEAR_USER: (state) => {
     state.token = ''
-    state.userInfo = {}
+    state.userInfo = {
+      role: '',
+      username: ''
+    }
     localStorage.removeItem('token')
-    localStorage.removeItem('userInfo')
   }
 }
 
 const actions = {
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
+    const { username, password, role } = userInfo
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password })
         .then(response => {
-          const { data } = response
-          commit('SET_TOKEN', data.token)
-          commit('SET_USER_INFO', data.userInfo)
+          commit('SET_USER_INFO', {
+            username,
+            role
+          })
           resolve()
         })
         .catch(error => {
