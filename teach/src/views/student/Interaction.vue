@@ -1,13 +1,8 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input
-        v-model="listQuery.keyword"
-        placeholder="请输入标题关键字"
-        style="width: 200px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
+      <el-input v-model="listQuery.keyword" placeholder="请输入标题关键字" style="width: 200px;" class="filter-item"
+        @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.type" placeholder="选择类型" clearable class="filter-item" style="width: 130px">
         <el-option label="讨论" value="discussion" />
         <el-option label="答疑" value="qa" />
@@ -20,21 +15,16 @@
       </el-button>
     </div>
 
-    <el-table
-      :data="list"
-      border
-      style="width: 100%"
-      v-loading="listLoading"
-    >
-      <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip />
+    <el-table :data="list" border style="width: 100%" v-loading="listLoading">
+      <el-table-column prop="topicTitle" label="标题" min-width="200" show-overflow-tooltip />
       <el-table-column prop="type" label="类型" width="100">
         <template slot-scope="{row}">
           {{ row.type === 'discussion' ? '讨论' : '答疑' }}
         </template>
       </el-table-column>
       <el-table-column prop="creator" label="发起人" width="120" />
-      <el-table-column prop="createTime" label="发起时间" width="160" />
-      <el-table-column prop="replyCount" label="回复数" width="80" align="center" />
+      <el-table-column prop="topicCreateTime" label="发起时间" width="160" />
+      <el-table-column prop="number" label="回复数" width="80" align="center" />
       <el-table-column label="操作" width="100" fixed="right">
         <template slot-scope="{row}">
           <el-button type="text" @click="handleView(row)">查看</el-button>
@@ -42,13 +32,8 @@
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
-      @pagination="getList"
-    />
+    <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit"
+      @pagination="getList" />
 
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible">
       <el-form ref="dataForm" :model="temp" label-width="100px" :rules="rules">
@@ -68,14 +53,14 @@
     <el-dialog title="详情" :visible.sync="detailVisible" width="50%">
       <div v-if="detail">
         <div class="detail-header">
-          <h3>{{ detail.title }}</h3>
+          <h3>{{ detail.topicTitle }}</h3>
           <p>
             <span>发起人: {{ detail.creator }}</span>
-            <span style="margin-left: 20px">发起时间: {{ detail.createTime }}</span>
+            <span style="margin-left: 20px">发起时间: {{ detail.topicCreateTime }}</span>
           </p>
         </div>
         <div class="detail-content">
-          {{ detail.content }}
+          {{ detail.number }}
         </div>
         <div class="reply-list">
           <div v-for="(reply, index) in detail.replies" :key="index" class="reply-item">
@@ -87,12 +72,7 @@
           </div>
         </div>
         <div class="reply-form">
-          <el-input
-            type="textarea"
-            v-model="replyContent"
-            :rows="3"
-            placeholder="请输入回复内容"
-          />
+          <el-input type="textarea" v-model="replyContent" :rows="3" placeholder="请输入回复内容" />
           <el-button type="primary" @click="handleReply" style="margin-top: 10px">
             回复
           </el-button>
@@ -104,11 +84,11 @@
 
 <script>
 import Pagination from '@/components/Pagination'
-import { 
-  getStudentInteractionList, 
+import {
+  getStudentInteractionList,
   createStudentInteraction,
   getInteractionDetail,
-  createInteractionReply 
+  createInteractionReply
 } from '@/api/student'
 import { Message } from 'element-ui'
 
@@ -151,8 +131,8 @@ export default {
     getList() {
       this.listLoading = true
       getStudentInteractionList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+        this.list = response.data
+
         this.listLoading = false
       }).catch(() => {
         this.listLoading = false
@@ -163,9 +143,19 @@ export default {
       this.getList()
     },
     handleCreate() {
+
+      let username = window.sessionStorage.getItem('user');
+      console.log(username)
+      // let user = JSON.stringify(username)
+      let user = JSON.parse(username);
+      console.log(user)
+
       this.temp = {
-        title: '',
+        topicTitle: '',
         content: '',
+        topicCreatorId: user.userId,
+        number: 0,
+        status: 0,
         type: this.listQuery.type
       }
       this.dialogTitle = this.listQuery.type === 'qa' ? '提问' : '发起讨论'
@@ -187,7 +177,7 @@ export default {
     },
     handleView(row) {
       this.detailVisible = true
-      getInteractionDetail(row.id).then(response => {
+      getInteractionDetail(row.topicId).then(response => {
         this.detail = response.data
       })
     },
@@ -196,9 +186,17 @@ export default {
         Message.warning('请输入回复内容')
         return
       }
+
+      let username = window.sessionStorage.getItem('user');
+      console.log(username)
+      // let user = JSON.stringify(username)
+      let user = JSON.parse(username);
+      console.log(user)
+
       createInteractionReply({
-        interactionId: this.detail.id,
-        content: this.replyContent
+        topicId: this.detail.topicId,
+        replyContent: this.replyContent,
+        replyCreatorId: user.userId
       }).then(() => {
         Message.success('回复成功')
         this.replyContent = ''
@@ -259,4 +257,4 @@ export default {
 .reply-form {
   margin-top: 20px;
 }
-</style> 
+</style>

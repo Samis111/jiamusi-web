@@ -1,24 +1,14 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input
-        v-model="listQuery.keyword"
-        placeholder="请输入试卷名称"
-        style="width: 200px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
+      <el-input v-model="listQuery.keyword" placeholder="请输入试卷名称" style="width: 200px;" class="filter-item"
+        @keyup.enter.native="handleFilter" />
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
     </div>
 
-    <el-table
-      :data="list"
-      border
-      style="width: 100%"
-      v-loading="listLoading"
-    >
+    <el-table :data="list" border style="width: 100%" v-loading="listLoading">
       <el-table-column prop="paperName" label="试卷名称" min-width="200" show-overflow-tooltip />
       <el-table-column prop="starttime" label="开始时间" width="160" />
       <el-table-column prop="endtime" label="结束时间" width="160" />
@@ -29,40 +19,25 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="score" label="得分" width="100" align="center">
+      <el-table-column prop="totalScore" label="总分得分" width="100" align="center">
         <template slot-scope="{row}">
-          {{ row.submitted ? row.score : '-' }}
+          {{  row.totalScore }}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="150" fixed="right">
         <template slot-scope="{row}">
-          <el-button 
-            type="text" 
-            @click="handleTest(row)"
-            :disabled="!canTakeTest(row)"
-          >
+          <el-button type="text" @click="handleTest(row)" :disabled="!canTakeTest(row)">
             {{ getActionText(row) }}
           </el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
-      @pagination="getList"
-    />
+    <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit"
+      @pagination="getList" />
 
-    <el-dialog 
-      :title="currentTest ? currentTest.paperName : ''" 
-      :visible.sync="dialogVisible" 
-      width="70%"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="false"
-    >
+    <el-dialog :title="currentTest ? currentTest.paperName : ''" :visible.sync="dialogVisible" width="70%"
+      :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
       <div v-if="currentTest && !currentTest.submitted">
         <div class="test-info">
           <span>剩余时间：{{ remainingTime }}</span>
@@ -76,20 +51,11 @@
           <div class="answer-area">
             <template v-if="question.type === 1">
               <el-radio-group v-model="answers[index]">
-                <el-radio
-                  v-for="(option, idx) in question.options"
-                  :key="idx"
-                  :label="option"
-                >{{ option }}</el-radio>
+                <el-radio v-for="(option, idx) in question.options" :key="idx" :label="option">{{ option }}</el-radio>
               </el-radio-group>
             </template>
             <template v-else>
-              <el-input
-                type="textarea"
-                v-model="answers[index]"
-                :rows="4"
-                placeholder="请输入答案"
-              />
+              <el-input type="textarea" v-model="answers[index]" :rows="4" placeholder="请输入答案" />
             </template>
           </div>
         </div>
@@ -181,8 +147,7 @@ export default {
     getList() {
       this.listLoading = true
       getStudentTestList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+        this.list = response.data
         this.listLoading = false
       }).catch(() => {
         this.listLoading = false
@@ -215,23 +180,23 @@ export default {
     },
     startTimer() {
       if (this.timer) clearInterval(this.timer)
-      
+
       const endTime = new Date(this.currentTest.endtime).getTime()
-      
+
       this.timer = setInterval(() => {
         const now = new Date().getTime()
         const distance = endTime - now
-        
+
         if (distance < 0) {
           clearInterval(this.timer)
           this.submitTest()
           return
         }
-        
+
         const hours = Math.floor(distance / (1000 * 60 * 60))
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
         const seconds = Math.floor((distance % (1000 * 60)) / 1000)
-        
+
         this.remainingTime = `${hours}:${minutes}:${seconds}`
       }, 1000)
     },
@@ -263,7 +228,7 @@ export default {
   background: #f5f7fa;
   border-radius: 4px;
   text-align: right;
-  
+
   span {
     color: #f56c6c;
     font-size: 16px;
@@ -276,21 +241,21 @@ export default {
   padding: 15px;
   border: 1px solid #dcdfe6;
   border-radius: 4px;
-  
+
   .question-content {
     margin-bottom: 10px;
     line-height: 1.6;
-    
+
     .question-no {
       font-weight: bold;
     }
-    
+
     .question-score {
       color: #909399;
       margin-left: 10px;
     }
   }
-  
+
   .answer-area {
     .el-radio-group {
       display: flex;
@@ -298,10 +263,10 @@ export default {
       gap: 10px;
     }
   }
-  
+
   .answer-info {
     color: #606266;
-    
+
     p {
       margin: 5px 0;
     }
@@ -312,7 +277,7 @@ export default {
   .result-header {
     margin-bottom: 20px;
     text-align: center;
-    
+
     h3 {
       color: #f56c6c;
       font-size: 24px;
@@ -324,4 +289,4 @@ export default {
   margin-top: 20px;
   text-align: right;
 }
-</style> 
+</style>

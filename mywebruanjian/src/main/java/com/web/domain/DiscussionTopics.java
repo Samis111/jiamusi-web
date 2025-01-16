@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 /**
@@ -35,6 +36,7 @@ public class DiscussionTopics implements Serializable {
     /**
      *
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date topicCreateTime;
 
     private Integer number;
@@ -48,6 +50,11 @@ public class DiscussionTopics implements Serializable {
     private String type;
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
+    @TableField(exist = false)
+    private String creator;
+
+
 
     @Override
     public boolean equals(Object that) {

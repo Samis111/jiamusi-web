@@ -135,8 +135,8 @@ export default {
     getList() {
       this.listLoading = true
       getStudentExerciseList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+        this.list = response.data
+  
         this.listLoading = false
       }).catch(() => {
         this.listLoading = false
@@ -147,6 +147,7 @@ export default {
       this.getList()
     },
     handleAnswer(row) {
+      //多道题概念
       this.currentExercise = row
       this.dialogTitle = row.answered ? '答题详情' : '开始答题'
       this.answer = ''

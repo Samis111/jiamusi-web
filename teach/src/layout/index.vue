@@ -30,8 +30,7 @@
               <span>学习中心</span>
             </template>
             <el-menu-item index="/student/exercise">
-              <i class="el-icon-edit-outline"></i>
-              <span>在线练习</span>
+          
             </el-menu-item>
             <el-menu-item index="/student/test">
               <i class="el-icon-notebook-2"></i>

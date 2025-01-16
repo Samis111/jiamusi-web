@@ -42,7 +42,7 @@
 
 <script>
 import { mapActions } from 'vuex'
-
+import { login } from '@/api/user.js'
 export default {
   name: 'Login',
   data() {
@@ -104,8 +104,11 @@ export default {
         if (valid) {
           this.loading = true
           this.login(this.loginForm)
-            .then(() => {
+            .then(res => {
               this.loading = false
+              console.log(res)
+              window.sessionStorage.setItem('user', res)
+
               // 根据角色跳转到不同的首页
               const { role } = this.loginForm
               const path = role === 'student' ? '/student/exercise' : '/teaching/interaction'

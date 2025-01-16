@@ -32,13 +32,17 @@ public class LoginController {
             queryWrapper.eq("password", userInfo.getPassword());
         }
 
-        List<UserInfo> list = userInfoService.list(queryWrapper);
-        if (list.size() == 1) {
-            return Result.ok(list.get(0));
+      try{
+          List<UserInfo> list = userInfoService.list(queryWrapper);
+          if (list.size() == 1) {
+              return Result.ok(list.get(0));
 
-        } else {
-            return Result.build(null, ResultCodeEnum.ACCOUNT_ERROR);
-        }
+          } else {
+              return Result.build(null, ResultCodeEnum.ACCOUNT_ERROR);
+          }
+      }catch (Exception e){
+          return Result.build(null, ResultCodeEnum.ACCOUNT_ERROR);
+      }
 
 
     }
