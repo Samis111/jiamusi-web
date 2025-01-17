@@ -161,16 +161,8 @@ export default {
       if (row.submitted) {
         this.showTestResult(row.id)
       } else {
-        this.startTest(row.id)
+        this.$router.push(`/student/test/answer/${row.id}`)
       }
-    },
-    startTest(testId) {
-      getTestDetail(testId).then(response => {
-        this.currentTest = response.data
-        this.answers = new Array(this.currentTest.questions.length).fill('')
-        this.dialogVisible = true
-        this.startTimer()
-      })
     },
     showTestResult(testId) {
       getTestDetail(testId).then(response => {

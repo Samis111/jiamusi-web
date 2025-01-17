@@ -71,10 +71,22 @@ const routes = [
         meta: { title: '在线练习' }
       },
       {
+        path: 'exercise/answer/:id',
+        name: 'ExerciseAnswer',
+        component: () => import('@/views/student/ExerciseAnswer'),
+        meta: { title: '练习答题', activeMenu: '/student/exercise' }
+      },
+      {
         path: 'test',
         name: 'StudentTest',
         component: () => import('@/views/student/Test'),
         meta: { title: '在线测试' }
+      },
+      {
+        path: 'test/answer/:id',
+        name: 'TestAnswer',
+        component: () => import('@/views/student/TestAnswer'),
+        meta: { title: '测试答题', activeMenu: '/student/test' }
       },
       {
         path: 'score',

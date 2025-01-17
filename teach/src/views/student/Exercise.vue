@@ -63,27 +63,59 @@
           {{ currentExercise.questionContent }}
         </div>
         <div class="answer-form" v-if="!currentExercise.answered">
-          <el-input
-            v-if="currentExercise.questionTypeId !== 1"
-            type="textarea"
-            v-model="answer"
-            :rows="4"
-            placeholder="请输入答案"
-          />
-          <el-radio-group v-else v-model="answer">
-            <el-radio
-              v-for="(option, index) in currentExercise.options"
-              :key="index"
-              :label="option"
-            >{{ option }}</el-radio>
-          </el-radio-group>
+          <!-- 单选题 -->
+          <template v-if="currentExercise.questionTypeId === 1">
+            <el-radio-group v-model="answer">
+              <el-radio v-for="(option, index) in currentExercise.options" 
+                :key="index" 
+                :label="option.value">
+                {{ option.label }}
+              </el-radio>
+            </el-radio-group>
+          </template>
+          
+          <!-- 多选题 -->
+          <template v-else-if="currentExercise.questionTypeId === 2">
+            <el-checkbox-group v-model="answer">
+              <el-checkbox v-for="(option, index) in currentExercise.options"
+                :key="index"
+                :label="option.value">
+                {{ option.label }}
+              </el-checkbox>
+            </el-checkbox-group>
+          </template>
+          
+          <!-- 填空题 -->
+          <template v-else-if="currentExercise.questionTypeId === 3">
+            <div v-for="(blank, index) in currentExercise.blanks" :key="index" class="blank-item">
+              <span class="blank-label">填空{{ index + 1 }}:</span>
+              <el-input v-model="answer[index]" placeholder="请输入答案" />
+            </div>
+          </template>
+          
+          <!-- 解答题 -->
+          <template v-else-if="currentExercise.questionTypeId === 4">
+            <el-input type="textarea" 
+              v-model="answer"
+              :rows="6"
+              placeholder="请输入答案"
+            />
+          </template>
+
           <div class="dialog-footer">
             <el-button @click="dialogVisible = false">取消</el-button>
             <el-button type="primary" @click="submitAnswer">提交答案</el-button>
           </div>
         </div>
         <div class="answer-detail" v-else>
-          <p>你的答案：{{ currentExercise.studentAnswer }}</p>
+          <p>你的答案：
+            <template v-if="currentExercise.questionTypeId === 2">
+              {{ formatMultiAnswer(currentExercise.studentAnswer) }}
+            </template>
+            <template v-else>
+              {{ currentExercise.studentAnswer }}
+            </template>
+          </p>
           <p>正确答案：{{ currentExercise.correctAnswer }}</p>
           <p>得分：{{ currentExercise.score }}</p>
         </div>
@@ -114,9 +146,10 @@ export default {
         type: undefined
       },
       exerciseTypes: [
-        { type_id: 1, type_name: '选择题' },
-        { type_id: 2, type_name: '填空题' },
-        { type_id: 3, type_name: '简答题' }
+        { type_id: 1, type_name: '单选题' },
+        { type_id: 2, type_name: '多选题' },
+        { type_id: 3, type_name: '填空题' },
+        { type_id: 4, type_name: '解答题' }
       ],
       dialogVisible: false,
       dialogTitle: '',
@@ -147,11 +180,15 @@ export default {
       this.getList()
     },
     handleAnswer(row) {
-      //多道题概念
-      this.currentExercise = row
-      this.dialogTitle = row.answered ? '答题详情' : '开始答题'
-      this.answer = ''
-      this.dialogVisible = true
+      if (row.answered) {
+        // 查看答题详情
+        this.currentExercise = row
+        this.dialogTitle = '答题详情'
+        this.dialogVisible = true
+      } else {
+        // 跳转到答题页面
+        this.$router.push(`/student/exercise/answer/${row.id}`)
+      }
     },
     submitAnswer() {
       if (!this.answer) {
@@ -166,6 +203,12 @@ export default {
         this.dialogVisible = false
         this.getList()
       })
+    },
+    formatMultiAnswer(answer) {
+      if (Array.isArray(answer)) {
+        return answer.join('、')
+      }
+      return answer
     }
   }
 }
@@ -202,5 +245,19 @@ export default {
 .dialog-footer {
   margin-top: 20px;
   text-align: right;
+}
+
+.blank-item {
+  margin-bottom: 15px;
+  
+  .blank-label {
+    display: inline-block;
+    width: 80px;
+    color: #606266;
+  }
+  
+  .el-input {
+    width: calc(100% - 90px);
+  }
 }
 </style> 
