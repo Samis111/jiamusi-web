@@ -46,10 +46,10 @@
           <el-input type="textarea" v-model="temp.paperNode" :rows="3" placeholder="请输入试卷说明" />
         </el-form-item>
         <el-form-item label="开始时间" prop="startTime">
-          <el-date-picker v-model="temp.startTime" type="datetime" placeholder="选择开始时间" />
+          <el-date-picker v-model="temp.startTime" type="datetime"  value-format="yyyy-MM-dd HH:mm:ss"  placeholder="选择开始时间" />
         </el-form-item>
         <el-form-item label="结束时间" prop="endTime">
-          <el-date-picker v-model="temp.endTime" type="datetime" placeholder="选择结束时间" />
+          <el-date-picker v-model="temp.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择结束时间" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -150,6 +150,8 @@
         <el-button type="primary" @click="submitQuestion">确认</el-button>
       </div>
     </el-dialog>
+
+    
   </div>
 </template>
 
@@ -188,9 +190,9 @@ export default {
       dialogStatus: '',
       dialogTitle: '',
       exerciseTypes: [
-        { type_id: 1, type_name: '选择题' },
-        { type_id: 2, type_name: '填空题' },
-        { type_id: 3, type_name: '简答题' }
+      { type_id: 1, type_name: '单选题' },
+        { type_id: 3, type_name: '填空题' },
+        { type_id: 4, type_name: '解答题' }
       ],
       answersVisible: false,
       currentAnswers: null,
@@ -394,6 +396,9 @@ export default {
           console.log(username)
 
           this.temp.paperCreatorId = user.userId;
+
+          console.log(this.temp);
+          
 
           createExercise(this.temp).then(() => {
             this.dialogVisible = false

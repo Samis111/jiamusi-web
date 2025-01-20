@@ -475,7 +475,7 @@ export function getExerciseQuestions(id) {
 
 export function updateTextExercise(data) {
   return request({
-    url: `/NewTextPapers/updateById/`,
+    url: `/NewTextPapers/updateById`,
     method: 'post',
     data
   })

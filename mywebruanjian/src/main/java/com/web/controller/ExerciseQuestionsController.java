@@ -93,8 +93,9 @@ public class ExerciseQuestionsController {
             questions.setQuestionCount(exerciseQuestions.getScore());
             questions.setQuestionCreatorId(exerciseQuestions.getQuestionCreatorId());
             questions.setNewquestionId(exerciseQuestions.getNewquestionId());
+
             boolean save = exerciseQuestionsService.save(questions);
-        } else if (exerciseQuestions.getQuestionTypeId() == 2) {
+        } else if (exerciseQuestions.getQuestionTypeId() == 1) {
 
             ExerciseQuestions questions = new ExerciseQuestions();
 
@@ -108,7 +109,7 @@ public class ExerciseQuestionsController {
             questions.setNewquestionId(exerciseQuestions.getNewquestionId());
             boolean save = exerciseQuestionsService.save(questions);
 
-        } else if (exerciseQuestions.getQuestionTypeId() == 1) {
+        } else if (exerciseQuestions.getQuestionTypeId() == 4) {
 
             ExerciseQuestions questions = new ExerciseQuestions();
 
@@ -116,10 +117,10 @@ public class ExerciseQuestionsController {
             questions.setQuestionTypeId(exerciseQuestions.getQuestionTypeId());
             questions.setQuestionCount(exerciseQuestions.getScore());
 
-            List<Options> options = exerciseQuestions.getOptions();
+
             questions.setQuestionCreatorId(exerciseQuestions.getQuestionCreatorId());
-            String s = appendOptions(options, questions.getQuestionAnswer());
-            questions.setQuestionAnswer(s);
+
+            questions.setQuestionAnswer(null);
             questions.setNewquestionId(exerciseQuestions.getNewquestionId());
             boolean save = exerciseQuestionsService.save(questions);
 
