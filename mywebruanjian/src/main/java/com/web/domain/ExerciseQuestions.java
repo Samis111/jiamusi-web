@@ -49,11 +49,12 @@ public class ExerciseQuestions implements Serializable {
 
     private Integer questionCount;
 
+    private String questionAnswer;
+
+    private Integer newquestionId;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
-
-
-    private String questionAnswer;
 
     @Override
     public boolean equals(Object that) {

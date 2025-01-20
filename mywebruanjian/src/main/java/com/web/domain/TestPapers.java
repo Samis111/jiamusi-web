@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -33,6 +34,7 @@ public class TestPapers implements Serializable {
      */
     private Integer paperCreatorId;
 
+    private String paperNode;
     /**
      * 
      */
@@ -45,7 +47,10 @@ public class TestPapers implements Serializable {
 
     private Integer status;
 
-    private Integer totalScore;
+    private String totalScore;
+
+    @TableField(exist = false)
+    private List<ExerciseQuestions> questions;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

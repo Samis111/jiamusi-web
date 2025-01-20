@@ -71,7 +71,7 @@ export function deleteCourseware(id) {
 // 练习管理
 export function getExerciseList(params) {
   return request({
-    url: '/exercise/list',
+    url: '/NewTextPapers/list',
     method: 'get',
     params
   })
@@ -79,7 +79,7 @@ export function getExerciseList(params) {
 
 export function createExercise(data) {
   return request({
-    url: '/exercise/create',
+    url: '/NewTextPapers/save',
     method: 'post',
     data
   })
@@ -195,7 +195,7 @@ export function deleteTest(id) {
 
 export function getTestQuestions(testId) {
   return request({
-    url: `/teaching/test/questions/${testId}`,
+    url: `/exercise/getNewExerciseQuestions/${testId}`,
     method: 'get'
   })
 }
@@ -446,3 +446,37 @@ export function getExerciseResults(exerciseId) {
   }
 }
 */ 
+
+
+export function addExerciseQuestion(data) {
+  return request({
+    url: `/exercise/createQuestions`,
+    method: 'post',
+    data:data,
+  })
+}
+
+
+export function deleteExerciseQuestion(id) {
+  return request({
+    url: `/exercise/delete/`+id,
+    method: 'post',
+  })
+}
+
+export function getExerciseQuestions(id) {
+  return request({
+    url: `/exercise/getExerciseQuestions/`+id,
+    method: 'get',
+  })
+}
+
+
+
+export function updateTextExercise(data) {
+  return request({
+    url: `/NewTextPapers/updateById/`,
+    method: 'post',
+    data
+  })
+}

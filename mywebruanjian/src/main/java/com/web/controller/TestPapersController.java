@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("test")
+@RequestMapping("/teaching/test")
 public class TestPapersController {
 
 
@@ -39,7 +39,7 @@ public class TestPapersController {
         return Result.ok(byId);
     }
 
-    @PostMapping("save")
+    @PostMapping("create")
     public Result<?> save(@RequestBody TestPapers userInfo) {
 
         boolean save = testPapersService.save(userInfo);
@@ -54,7 +54,7 @@ public class TestPapersController {
         return Result.ok();
     }
 
-    @PostMapping("removeById/{id}")
+    @PostMapping("delete/{id}")
     public Result<?> removeById(@PathVariable Integer id) {
 
         boolean byId = testPapersService.removeById(id);

@@ -107,7 +107,8 @@ export default {
             .then(res => {
               this.loading = false
               console.log(res)
-              window.sessionStorage.setItem('user', res.data)
+       
+              window.sessionStorage.setItem('user',JSON.stringify(res.data))
 
               // 根据角色跳转到不同的首页
               const { role } = this.loginForm

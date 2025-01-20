@@ -21,7 +21,7 @@
       </el-table-column>
       <el-table-column prop="totalScore" label="总分得分" width="100" align="center">
         <template slot-scope="{row}">
-          {{  row.totalScore }}
+          {{ row.totalScore }}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="150" fixed="right">
@@ -142,7 +142,7 @@ export default {
       return '已结束'
     },
     canTakeTest(row) {
-      return row.submitted || row.status === 1
+      return row.submitted || row.status === 0
     },
     getList() {
       this.listLoading = true
@@ -158,10 +158,12 @@ export default {
       this.getList()
     },
     handleTest(row) {
+      console.log(row)
+
       if (row.submitted) {
-        this.showTestResult(row.id)
+        this.showTestResult(row.paperId)
       } else {
-        this.$router.push(`/student/test/answer/${row.id}`)
+        this.$router.push(`/student/test/answer/${row.paperId}`)
       }
     },
     showTestResult(testId) {

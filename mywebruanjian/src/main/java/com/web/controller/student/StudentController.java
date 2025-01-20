@@ -15,7 +15,7 @@ import java.util.List;
 public class StudentController {
 
     @Autowired
-    private TestPapersService exerciseQuestionsService;
+    private TestPapersService testPapersService;
 
     @Autowired
     private DiscussionTopicsService discussionTopicsService;
@@ -26,18 +26,23 @@ public class StudentController {
     @Autowired
     private DiscussionRepliesService discussionRepliesService;
 
+    @Autowired
+    private ExerciseQuestionsService exerciseQuestionsService;
+
+    @Autowired
+    private NewtextPapersService newtextPapersService;
 
     @GetMapping("/exercise/list")
     public Result<List<TestPapers>> exerciseList(@RequestParam("keyword") String keyword) {
         QueryWrapper<TestPapers> queryWrapper = new QueryWrapper<>();
-        List<TestPapers> list = exerciseQuestionsService.list(queryWrapper);
+        List<TestPapers> list = testPapersService.list(queryWrapper);
         return Result.ok(list);
     }
 
     @GetMapping("/test/list")
     public Result<List<TestPapers>> textList(@RequestParam("keyword") String keyword) {
         QueryWrapper<TestPapers> queryWrapper = new QueryWrapper<>();
-        List<TestPapers> list = exerciseQuestionsService.list(queryWrapper);
+        List<TestPapers> list = testPapersService.list(queryWrapper);
         return Result.ok(list);
     }
 
@@ -80,5 +85,39 @@ public class StudentController {
         boolean save = discussionTopicsService.save(discussionTopics);
         return Result.ok();
     }
+
+    @RequestMapping("/test/detail/{id}")
+    public Result<?> testDetail(@PathVariable("id") Integer id) {
+
+        QueryWrapper<ExerciseQuestions> queryWrapper = new QueryWrapper<>();
+
+        queryWrapper.eq("newquestion_id", id);
+
+        TestPapers testPapersServiceById = testPapersService.getById(id);
+
+        List<ExerciseQuestions> list = exerciseQuestionsService.list(queryWrapper);
+
+        testPapersServiceById.setQuestions(list);
+
+        return Result.ok(testPapersServiceById);
+    }
+
+
+    @RequestMapping("/exercise/detail/{id}")
+    public Result<?> exerciseDetail(@PathVariable("id") Integer id) {
+
+        QueryWrapper<ExerciseQuestions> queryWrapper = new QueryWrapper<>();
+
+        queryWrapper.eq("question_creator_id", id);
+
+        NewtextPapers testPapersServiceById = newtextPapersService.getById(id);
+
+        List<ExerciseQuestions> list = exerciseQuestionsService.list(queryWrapper);
+
+        testPapersServiceById.setQuestions(list);
+
+        return Result.ok(testPapersServiceById);
+    }
+
 
 }

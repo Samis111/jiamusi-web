@@ -43,7 +43,7 @@ public class StudentScores implements Serializable {
      */
     private Date testTime;
     @TableField(exist = false)
-    private Integer total;
+    private String total;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

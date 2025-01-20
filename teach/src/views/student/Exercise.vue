@@ -1,38 +1,19 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input
-        v-model="listQuery.keyword"
-        placeholder="请输入练习标题"
-        style="width: 200px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
+      <el-input v-model="listQuery.keyword" placeholder="请输入练习标题" style="width: 200px;" class="filter-item"
+        @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.type" placeholder="选择题目类型" clearable class="filter-item" style="width: 130px">
-        <el-option
-          v-for="item in exerciseTypes"
-          :key="item.type_id"
-          :label="item.type_name"
-          :value="item.type_id"
-        />
+        <el-option v-for="item in exerciseTypes" :key="item.type_id" :label="item.type_name" :value="item.type_id" />
       </el-select>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
     </div>
 
-    <el-table
-      :data="list"
-      border
-      style="width: 100%"
-      v-loading="listLoading"
-    >
-      <el-table-column prop="questionContent" label="练习标题" min-width="200" show-overflow-tooltip />
-      <el-table-column prop="type" label="题目类型" width="120">
-        <template slot-scope="{row}">
-          {{ getExerciseTypeName(row.questionTypeId) }}
-        </template>
-      </el-table-column>
+    <el-table :data="list" border style="width: 100%" v-loading="listLoading">
+      <el-table-column prop="paperName" label="练习标题" min-width="200" show-overflow-tooltip />
+      <el-table-column prop="paperNode" label="练习备注" min-width="200" show-overflow-tooltip />
       <el-table-column prop="status" label="状态" width="100">
         <template slot-scope="{row}">
           <el-tag :type="row.answered ? 'success' : 'info'">
@@ -49,13 +30,8 @@
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
-      @pagination="getList"
-    />
+    <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit"
+      @pagination="getList" />
 
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="60%">
       <div v-if="currentExercise">
@@ -66,25 +42,21 @@
           <!-- 单选题 -->
           <template v-if="currentExercise.questionTypeId === 1">
             <el-radio-group v-model="answer">
-              <el-radio v-for="(option, index) in currentExercise.options" 
-                :key="index" 
-                :label="option.value">
+              <el-radio v-for="(option, index) in currentExercise.options" :key="index" :label="option.value">
                 {{ option.label }}
               </el-radio>
             </el-radio-group>
           </template>
-          
+
           <!-- 多选题 -->
           <template v-else-if="currentExercise.questionTypeId === 2">
             <el-checkbox-group v-model="answer">
-              <el-checkbox v-for="(option, index) in currentExercise.options"
-                :key="index"
-                :label="option.value">
+              <el-checkbox v-for="(option, index) in currentExercise.options" :key="index" :label="option.value">
                 {{ option.label }}
               </el-checkbox>
             </el-checkbox-group>
           </template>
-          
+
           <!-- 填空题 -->
           <template v-else-if="currentExercise.questionTypeId === 3">
             <div v-for="(blank, index) in currentExercise.blanks" :key="index" class="blank-item">
@@ -92,14 +64,10 @@
               <el-input v-model="answer[index]" placeholder="请输入答案" />
             </div>
           </template>
-          
+
           <!-- 解答题 -->
           <template v-else-if="currentExercise.questionTypeId === 4">
-            <el-input type="textarea" 
-              v-model="answer"
-              :rows="6"
-              placeholder="请输入答案"
-            />
+            <el-input type="textarea" v-model="answer" :rows="6" placeholder="请输入答案" />
           </template>
 
           <div class="dialog-footer">
@@ -161,6 +129,14 @@ export default {
     this.getList()
   },
   methods: {
+    getStatusText(status) {
+      const statusMap = {
+        0: '未开始',
+        1: '进行中',
+        2: '已结束'
+      }
+      return statusMap[status]
+    },
     getExerciseTypeName(typeId) {
       const type = this.exerciseTypes.find(t => t.type_id === typeId)
       return type ? type.type_name : '未知'
@@ -169,7 +145,7 @@ export default {
       this.listLoading = true
       getStudentExerciseList(this.listQuery).then(response => {
         this.list = response.data
-  
+
         this.listLoading = false
       }).catch(() => {
         this.listLoading = false
@@ -187,7 +163,7 @@ export default {
         this.dialogVisible = true
       } else {
         // 跳转到答题页面
-        this.$router.push(`/student/exercise/answer/${row.id}`)
+        this.$router.push(`/student/exercise/answer/${row.paperId}`)
       }
     },
     submitAnswer() {
@@ -235,7 +211,7 @@ export default {
   padding: 15px;
   background: #f5f7fa;
   border-radius: 4px;
-  
+
   p {
     margin: 5px 0;
     color: #606266;
@@ -249,15 +225,15 @@ export default {
 
 .blank-item {
   margin-bottom: 15px;
-  
+
   .blank-label {
     display: inline-block;
     width: 80px;
     color: #606266;
   }
-  
+
   .el-input {
     width: calc(100% - 90px);
   }
 }
-</style> 
+</style>

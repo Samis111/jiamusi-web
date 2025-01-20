@@ -15,7 +15,7 @@
             <option name="ignoreTablePrefix" value="" />
             <option name="ignoreTableSuffix" value="" />
             <option name="moduleName" value="mywebruanjian" />
-            <option name="modulePath" value="$PROJECT_DIR$" />
+            <option name="modulePath" value="$PROJECT_DIR$/" />
             <option name="moduleUIInfoList">
               <list>
                 <ModuleUIInfo>
@@ -63,52 +63,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="CoursewareType" />
-                  <option name="tableName" value="courseware_type" />
-                </TableUIInfo>
-                <TableUIInfo>
-                  <option name="className" value="DiscussionReplies" />
-                  <option name="tableName" value="discussion_replies" />
-                </TableUIInfo>
-                <TableUIInfo>
-                  <option name="className" value="DiscussionTopics" />
-                  <option name="tableName" value="discussion_topics" />
-                </TableUIInfo>
-                <TableUIInfo>
-                  <option name="className" value="ExerciseQuestions" />
-                  <option name="tableName" value="exercise_questions" />
-                </TableUIInfo>
-                <TableUIInfo>
-                  <option name="className" value="ExerciseType" />
-                  <option name="tableName" value="exercise_type" />
-                </TableUIInfo>
-                <TableUIInfo>
-                  <option name="className" value="MultimediaCourseware" />
-                  <option name="tableName" value="multimedia_courseware" />
-                </TableUIInfo>
-                <TableUIInfo>
-                  <option name="className" value="PaperQuestionRelation" />
-                  <option name="tableName" value="paper_question_relation" />
-                </TableUIInfo>
-                <TableUIInfo>
-                  <option name="className" value="QuestionAnswer" />
-                  <option name="tableName" value="question_answer" />
-                </TableUIInfo>
-                <TableUIInfo>
-                  <option name="className" value="StudentAnswers" />
-                  <option name="tableName" value="student_answers" />
-                </TableUIInfo>
-                <TableUIInfo>
-                  <option name="className" value="StudentScores" />
-                  <option name="tableName" value="student_scores" />
-                </TableUIInfo>
-                <TableUIInfo>
-                  <option name="className" value="TestPapers" />
-                  <option name="tableName" value="test_papers" />
-                </TableUIInfo>
-                <TableUIInfo>
-                  <option name="className" value="UserInfo" />
-                  <option name="tableName" value="user_info" />
+                  <option name="className" value="NewtextPapers" />
+                  <option name="tableName" value="newtext_papers" />
                 </TableUIInfo>
               </list>
             </option>

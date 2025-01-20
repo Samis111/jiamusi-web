@@ -14,7 +14,7 @@
         <div class="question-header">
           <span class="question-no">第{{ index + 1 }}题</span>
           <span class="question-type">({{ getTypeName(question.questionTypeId) }})</span>
-          <span class="question-score">{{ question.score }}分</span>
+          <span class="question-score">{{ question.questionCount }}分</span>
         </div>
 
         <div class="question-content">{{ question.questionContent }}</div>
@@ -118,11 +118,13 @@ export default {
       getTestDetail(testId).then(res => {
         this.paper = res.data
         // 初始化答案数组
-        this.answers = this.paper.questions.map(q => {
-          if (q.questionTypeId === 2) return [] // 多选题
-          if (q.questionTypeId === 3) return new Array(q.blanks?.length || 0).fill('') // 填空题
-          return '' // 单选题和解答题
-        })
+        // this.answers = this.paper.questions.map(q => {
+        //   if (q.questionTypeId === 2) return [] // 多选题
+        //   if (q.questionTypeId === 3) return new Array(q.blanks?.length || 0).fill('') // 填空题
+        //   return '' // 单选题和解答题
+        // })
+
+
         this.startTimer()
       })
     },
