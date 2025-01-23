@@ -26,9 +26,9 @@
               <el-radio 
                 v-for="(option, optionIndex) in getOptions(question.questionAnswer)" 
                 :key="optionIndex"
-                :label="option"
+                :label="getOptionLabel(optionIndex)"
               >
-                {{ option}}
+                {{ getOptionLabel(optionIndex) }}. {{ option }}
               </el-radio>
             </el-radio-group>
           </template>
@@ -179,9 +179,10 @@ export default {
     handleSubmit(isTimeout = false) {
       // 构造提交的答案数据
       const submitData = {
-        testId: this.$route.params.id,
+        paperId: this.$route.params.id,
+        userId: JSON.parse(localStorage.getItem('userInfo')).userId,
         answers: this.paper.questions.map((question, index) => ({
-          questionId: question.questionId,
+          ...question,
           answer: this.answers[index] || ''
         }))
       }
@@ -191,6 +192,9 @@ export default {
         this.$router.push('/student/test')
       })
     },
+    getOptionLabel(index) {
+      return String.fromCharCode(65 + index) // 65 是字符 'A' 的 ASCII 码
+    },
     getOptions(answerStr) {
       try {
         // 解析字符串形如 "[=1,=2,=3][null]" 
@@ -198,7 +202,7 @@ export default {
         if (matches && matches.length > 0) {
           // 取第一个中括号内的内容并分割成数组
           const options = matches[0].slice(1, -1).split(',');
-          return options.map(opt => opt.trim()); // 去除空格
+          return options.map(opt => opt.trim().replace('=', '')); // 去除空格和等号
         }
         return [];
       } catch (error) {
@@ -272,11 +276,19 @@ export default {
     }
 
     .answer-area {
-      .el-radio-group,
-      .el-checkbox-group {
+      .el-radio-group {
         display: flex;
         flex-direction: column;
         gap: 12px;
+
+        .el-radio {
+          margin-left: 0 !important; // 覆盖默认的左边距
+          
+          /deep/ .el-radio__label {
+            white-space: normal; // 允许文字换行
+            padding-left: 8px;
+          }
+        }
       }
 
       .blank-item {

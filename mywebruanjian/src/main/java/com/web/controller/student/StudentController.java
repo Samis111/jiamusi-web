@@ -3,6 +3,7 @@ package com.web.controller.student;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.web.domain.*;
 import com.web.domain.DTO.StudentRepliesAndTopics;
+import com.web.domain.DTO.TestPapersDTO;
 import com.web.domain.common.Result;
 import com.web.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +90,13 @@ public class StudentController {
     @RequestMapping("/interaction/create")
     public Result<?> create(@RequestBody DiscussionTopics discussionTopics) {
         boolean save = discussionTopicsService.save(discussionTopics);
+        return Result.ok();
+    }
+
+
+    @PostMapping("/test/submit")
+    public Result<?> submit(@RequestBody TestPapersDTO testPapersDTO) {
+        System.out.println(testPapersDTO);
         return Result.ok();
     }
 

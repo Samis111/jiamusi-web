@@ -54,6 +54,9 @@ public class ExerciseQuestions implements Serializable {
     private Integer newquestionId;
 
     @TableField(exist = false)
+    private String  answer;
+
+    @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
     @Override
