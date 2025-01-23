@@ -38,7 +38,7 @@ public class DiscussionTopicsController {
         return Result.ok(byId);
     }
 
-    @PostMapping("save")
+    @PostMapping("create")
     public Result<?> save(@RequestBody DiscussionTopics userInfo) {
 
         boolean save = discussionTopicsService.save(userInfo);

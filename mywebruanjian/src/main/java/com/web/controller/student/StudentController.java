@@ -2,6 +2,7 @@ package com.web.controller.student;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.web.domain.*;
+import com.web.domain.DTO.Options;
 import com.web.domain.DTO.StudentRepliesAndTopics;
 import com.web.domain.DTO.TestPapersDTO;
 import com.web.domain.common.Result;
@@ -97,7 +98,70 @@ public class StudentController {
     @PostMapping("/test/submit")
     public Result<?> submit(@RequestBody TestPapersDTO testPapersDTO) {
         System.out.println(testPapersDTO);
-        return Result.ok();
+        Integer chengji = 0;
+
+        for (ExerciseQuestions exerciseQuestions : testPapersDTO.getAnswers()) {
+
+
+            if (exerciseQuestions.getQuestionTypeId() == 3) {
+
+                ExerciseQuestions questions = new ExerciseQuestions();
+                questions.setQuestionAnswer(exerciseQuestions.getAnswer());
+
+                questions.setQuestionTypeId(exerciseQuestions.getQuestionTypeId());
+                questions.setQuestionCount(exerciseQuestions.getQuestionCount());
+                questions.setQuestionCreatorId(exerciseQuestions.getQuestionCreatorId());
+                questions.setNewquestionId(exerciseQuestions.getNewquestionId());
+
+                String questionAnswer = exerciseQuestions.getQuestionAnswer();
+                String answer = exerciseQuestions.getAnswer();
+                if (questionAnswer.equals(answer)) {
+                    Integer questionCount = exerciseQuestions.getQuestionCount();
+                    chengji = chengji + questionCount;
+                }
+
+            } else if (exerciseQuestions.getQuestionTypeId() == 1) {
+
+                ExerciseQuestions questions = new ExerciseQuestions();
+
+
+                questions.setQuestionTypeId(exerciseQuestions.getQuestionTypeId());
+                questions.setQuestionCount(exerciseQuestions.getQuestionCount());
+                questions.setQuestionCreatorId(exerciseQuestions.getQuestionCreatorId());
+                questions.setNewquestionId(exerciseQuestions.getNewquestionId());
+
+
+                String questionAnswer = getAnswer(exerciseQuestions.getQuestionAnswer());
+                String answer = exerciseQuestions.getAnswer();
+                
+            } else if (exerciseQuestions.getQuestionTypeId() == 4) {
+
+                ExerciseQuestions questions = new ExerciseQuestions();
+
+                questions.setQuestionTypeId(exerciseQuestions.getQuestionTypeId());
+                questions.setQuestionCreatorId(exerciseQuestions.getQuestionCreatorId());
+                questions.setQuestionAnswer(exerciseQuestions.getAnswer());
+                questions.setNewquestionId(exerciseQuestions.getNewquestionId());
+
+                String questionAnswer = exerciseQuestions.getQuestionAnswer();
+                String answer = exerciseQuestions.getAnswer();
+                if (questionAnswer.equals(answer)) {
+                    Integer questionCount = exerciseQuestions.getQuestionCount();
+                    chengji = chengji + questionCount;
+                }
+            }
+
+        }
+
+
+        return Result.ok(chengji);
+    }
+
+    private String getAnswer(String questionAnswer) {
+        String[] split = questionAnswer.split("]");
+        System.out.println(split);
+
+        return null;
     }
 
     @RequestMapping("/test/detail/{id}")
