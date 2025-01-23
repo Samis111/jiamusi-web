@@ -352,13 +352,7 @@ export function getAnswerDetail(id) {
   })
 }
 
-// 获取试卷列表（用于成绩管理的筛选）
-export function getPaperList() {
-  return request({
-    url: '/test/paper-list',
-    method: 'get'
-  })
-}
+
 
 // 成绩管理
 export function getScoreList(params) {
@@ -378,8 +372,8 @@ export function getScoreDetail(id) {
 
 export function getScoreStats(params) {
   return request({
-    url: '/score/stats',
-    method: 'get',
+    url: '/echarts/getScores',
+    method: 'post',
     params
   })
 }

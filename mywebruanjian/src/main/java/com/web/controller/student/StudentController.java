@@ -7,6 +7,7 @@ import com.web.domain.DTO.StudentRepliesAndTopics;
 import com.web.domain.DTO.TestPapersDTO;
 import com.web.domain.common.Result;
 import com.web.service.*;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +35,9 @@ public class StudentController {
     @Autowired
     private NewtextPapersService newtextPapersService;
 
+    @Autowired
+    private StudentScoresService studentScoresService;
+
     @GetMapping("/exercise/list")
     public Result<List<TestPapers>> exerciseList(@RequestParam("keyword") String keyword) {
         QueryWrapper<TestPapers> queryWrapper = new QueryWrapper<>();
@@ -42,9 +46,30 @@ public class StudentController {
     }
 
     @GetMapping("/test/list")
-    public Result<List<TestPapers>> textList(@RequestParam("keyword") String keyword) {
+    public Result<List<TestPapers>> textList(@RequestParam("keyword") String keywor, @RequestParam("userId") Integer userId) {
         QueryWrapper<TestPapers> queryWrapper = new QueryWrapper<>();
         List<TestPapers> list = testPapersService.list(queryWrapper);
+
+
+
+        for (TestPapers testPapers : list) {
+            Integer paperId = testPapers.getPaperId();
+
+
+            QueryWrapper<StudentScores> queryWrapper1 = new QueryWrapper<>();
+            queryWrapper1.eq("student_id", userId).eq("paper_id", paperId);
+            StudentScores one = studentScoresService.list(queryWrapper1).get(0);
+            if (one == null) {
+                testPapers.setNewStatus(0);
+
+            } else {
+                testPapers.setNewStatus(1);
+            }
+
+        }
+
+
+
         return Result.ok(list);
     }
 
@@ -133,7 +158,12 @@ public class StudentController {
 
                 String questionAnswer = getAnswer(exerciseQuestions.getQuestionAnswer());
                 String answer = exerciseQuestions.getAnswer();
-                
+
+                 if (questionAnswer.equals(answer)) {
+                    Integer questionCount = exerciseQuestions.getQuestionCount();
+                    chengji = chengji + questionCount;
+                }
+
             } else if (exerciseQuestions.getQuestionTypeId() == 4) {
 
                 ExerciseQuestions questions = new ExerciseQuestions();
@@ -154,6 +184,18 @@ public class StudentController {
         }
 
 
+        TestPapers testPapersServiceById = testPapersService.getById(testPapersDTO.getPaperId());
+
+        StudentScores scores = new StudentScores();
+        scores.setTotal(chengji+"");
+        scores.setTotalScore(testPapersServiceById.getTotalScore());
+        scores.setPaperId(testPapersServiceById.getPaperId());
+        scores.setPaperName(testPapersServiceById.getPaperName());
+        scores.setStudentId(testPapersDTO.getUserId());
+
+        studentScoresService.save(scores);
+
+
         return Result.ok(chengji);
     }
 
@@ -161,7 +203,9 @@ public class StudentController {
         String[] split = questionAnswer.split("]");
         System.out.println(split);
 
-        return null;
+        String i = split[1].substring(1,split[1].length());
+
+        return i;
     }
 
     @RequestMapping("/test/detail/{id}")
@@ -197,5 +241,116 @@ public class StudentController {
         return Result.ok(testPapersServiceById);
     }
 
+
+    @GetMapping("/score/list")
+    public Result<List<StudentScores>> scoreList(@RequestParam("userId") Integer userId) {
+        QueryWrapper<StudentScores> queryWrapper = new QueryWrapper<>();
+
+//        if (userInfo.getUsername() != null && !userInfo.getUsername().equals("")) {
+//            queryWrapper.eq("username", userInfo.getUsername());
+//        }
+
+        queryWrapper.eq("student_id", userId);
+        List<StudentScores> list = studentScoresService.list(queryWrapper);
+
+        for (StudentScores scores : list) {
+
+            try {
+                UserInfo userInfoServiceById = userInfoService.getById(scores.getStudentId());
+                TestPapers testPapersServiceById = testPapersService.getById(scores.getPaperId());
+
+                scores.setStudentName(userInfoServiceById.getUsername());
+                scores.setPaperName(testPapersServiceById.getPaperName());
+                scores.setTotal(testPapersServiceById.getTotalScore());
+
+            } catch (Exception e) {
+            }
+        }
+
+
+        return Result.ok(list);
+    }
+
+
+    @PostMapping("/exercise/submit")
+    public Result<?> exerciseSubmit(@RequestBody TestPapersDTO testPapersDTO) {
+        System.out.println(testPapersDTO);
+        Integer chengji = 0;
+
+        for (ExerciseQuestions exerciseQuestions : testPapersDTO.getAnswers()) {
+
+
+            if (exerciseQuestions.getQuestionTypeId() == 3) {
+
+                ExerciseQuestions questions = new ExerciseQuestions();
+                questions.setQuestionAnswer(exerciseQuestions.getAnswer());
+
+                questions.setQuestionTypeId(exerciseQuestions.getQuestionTypeId());
+                questions.setQuestionCount(exerciseQuestions.getQuestionCount());
+                questions.setQuestionCreatorId(exerciseQuestions.getQuestionCreatorId());
+                questions.setNewquestionId(exerciseQuestions.getNewquestionId());
+
+                String questionAnswer = exerciseQuestions.getQuestionAnswer();
+                String answer = exerciseQuestions.getAnswer();
+                if (questionAnswer.equals(answer)) {
+                    Integer questionCount = exerciseQuestions.getQuestionCount();
+                    chengji = chengji + questionCount;
+                }
+
+            } else if (exerciseQuestions.getQuestionTypeId() == 1) {
+
+                ExerciseQuestions questions = new ExerciseQuestions();
+
+
+                questions.setQuestionTypeId(exerciseQuestions.getQuestionTypeId());
+                questions.setQuestionCount(exerciseQuestions.getQuestionCount());
+                questions.setQuestionCreatorId(exerciseQuestions.getQuestionCreatorId());
+                questions.setNewquestionId(exerciseQuestions.getNewquestionId());
+
+
+                String questionAnswer = getAnswer(exerciseQuestions.getQuestionAnswer());
+                String answer = exerciseQuestions.getAnswer();
+
+                if (questionAnswer.equals(answer)) {
+                    Integer questionCount = exerciseQuestions.getQuestionCount();
+                    chengji = chengji + questionCount;
+                }
+
+            } else if (exerciseQuestions.getQuestionTypeId() == 4) {
+
+                ExerciseQuestions questions = new ExerciseQuestions();
+
+                questions.setQuestionTypeId(exerciseQuestions.getQuestionTypeId());
+                questions.setQuestionCreatorId(exerciseQuestions.getQuestionCreatorId());
+                questions.setQuestionAnswer(exerciseQuestions.getAnswer());
+                questions.setNewquestionId(exerciseQuestions.getNewquestionId());
+
+                String questionAnswer = exerciseQuestions.getQuestionAnswer();
+                String answer = exerciseQuestions.getAnswer();
+                if (questionAnswer.equals(answer)) {
+                    Integer questionCount = exerciseQuestions.getQuestionCount();
+                    chengji = chengji + questionCount;
+                }
+            }
+
+        }
+
+
+        TestPapers testPapersServiceById = testPapersService.getById(testPapersDTO.getPaperId());
+
+
+
+        StudentScores scores = new StudentScores();
+        scores.setTotal(chengji+"");
+        scores.setTotalScore(testPapersServiceById.getTotalScore());
+        scores.setPaperId(testPapersServiceById.getPaperId());
+        scores.setPaperName(testPapersServiceById.getPaperName());
+        scores.setStudentId(testPapersDTO.getUserId());
+
+        studentScoresService.save(scores);
+
+
+        return Result.ok(chengji);
+    }
 
 }

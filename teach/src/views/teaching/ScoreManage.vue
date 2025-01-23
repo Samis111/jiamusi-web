@@ -6,9 +6,6 @@
       <el-select v-model="listQuery.paper_id" placeholder="选择试卷" clearable class="filter-item" style="width: 200px">
         <el-option v-for="item in papers" :key="item.paper_id" :label="item.paper_name" :value="item.paper_id" />
       </el-select>
-      <el-select v-model="listQuery.type" placeholder="选择题目类型" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in exerciseTypes" :key="item.type_id" :label="item.type_name" :value="item.type_id" />
-      </el-select>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
@@ -31,11 +28,11 @@
           <el-table-column prop="totalScore" label="得分" width="100" align="center" />
           <el-table-column prop="total" label="总分" width="100" align="center" />
           <el-table-column prop="testTime" label="考试时间" width="160" />
-          <el-table-column label="操作" width="150">
+          <!-- <el-table-column label="操作" width="150">
             <template slot-scope="{row}">
               <el-button type="text" @click="handleDetail(row)">查看详情</el-button>
             </template>
-          </el-table-column>
+          </el-table-column> -->
         </el-table>
 
         <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit"
@@ -51,7 +48,7 @@
             <el-card class="box-card">
               <div slot="header" class="clearfix">
                 <span>统计信息</span>
-                <el-select v-model="statsQuery.paper_id" placeholder="选择试卷" size="small"
+                <el-select v-model="statsQuery.paperId" placeholder="选择试卷" size="small"
                   style="float: right; width: 200px" @change="handleStatsChange">
                   <el-option v-for="item in papers" :key="item.paper_id" :label="item.paper_name"
                     :value="item.paper_id" />
@@ -59,24 +56,24 @@
               </div>
               <div class="stats-item">
                 <span class="label">参考人数：</span>
-                <span class="value">{{ stats.total_students }}</span>
+                <span class="value">{{ stats.count }}</span>
               </div>
               <div class="stats-item">
                 <span class="label">平均分：</span>
-                <span class="value">{{ stats.average_score }}</span>
+                <span class="value">{{ stats.avg }}</span>
               </div>
               <div class="stats-item">
                 <span class="label">最高分：</span>
-                <span class="value">{{ stats.max_score }}</span>
+                <span class="value">{{ stats.max }}</span>
               </div>
               <div class="stats-item">
                 <span class="label">最低分：</span>
-                <span class="value">{{ stats.min_score }}</span>
+                <span class="value">{{ stats.min }}</span>
               </div>
-              <div class="stats-item">
+              <!-- <div class="stats-item">
                 <span class="label">及格率：</span>
                 <span class="value">{{ stats.pass_rate }}%</span>
-              </div>
+              </div> -->
             </el-card>
           </div>
         </div>
@@ -116,7 +113,7 @@ import {
   getScoreDetail,
   getScoreStats,
   exportScore,
-  getPaperList
+  getTestList
 } from '@/api/teaching'
 import { Message } from 'element-ui'
 import * as echarts from 'echarts'
@@ -148,7 +145,7 @@ export default {
       detailVisible: false,
       scoreDetail: null,
       statsQuery: {
-        paper_id: undefined
+        paperId: undefined
       },
       stats: {
         total_students: 0,
@@ -156,6 +153,11 @@ export default {
         max_score: 0,
         min_score: 0,
         pass_rate: 0
+      },
+      paperQuery: {
+        page: 1,
+        limit: 999,
+        keyword: ''
       }
     }
   },
@@ -169,8 +171,11 @@ export default {
       return type ? type.type_name : '未知'
     },
     getPapers() {
-      getPaperList().then(response => {
-        this.papers = response.data
+      getTestList(this.paperQuery).then(response => {
+        this.papers = response.data.map(item => ({
+          paper_id: item.paperId,
+          paper_name: item.paperName
+        }))
       })
     },
     getList() {
@@ -216,26 +221,74 @@ export default {
     getStats() {
       getScoreStats(this.statsQuery).then(response => {
         this.stats = response.data
+        this.initCharts()
       })
     },
     initCharts() {
-      const chart = echarts.init(this.$refs.scoreDistribution)
+      const chart = echarts.init(this.$refs.scoreDistribution, null, {
+        width: 'auto',
+        height: 500
+      })
+      
+      this.$nextTick(() => {
+        chart.resize()
+      })
+
       chart.setOption({
         title: {
-          text: '成绩分布'
+          text: '成绩分布',
+          left: 'center',
+          top: 20
         },
-        tooltip: {},
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
         xAxis: {
           type: 'category',
-          data: ['0-60', '60-70', '70-80', '80-90', '90-100']
+          data: ['0-60', '60-70', '70-80', '80-90', '90-100'],
+          axisLabel: {
+            interval: 0,
+            fontSize: 14
+          }
         },
         yAxis: {
-          type: 'value'
+          type: 'value',
+          name: '人数',
+          nameTextStyle: {
+            fontSize: 14
+          }
         },
         series: [{
-          data: [5, 20, 36, 10, 10],
-          type: 'bar'
+          data: this.stats.integers,
+          type: 'bar',
+          barWidth: '40%',
+          itemStyle: {
+            color: '#409EFF'
+          },
+          label: {
+            show: true,
+            position: 'top'
+          }
         }]
+      })
+
+      window.addEventListener('resize', () => {
+        chart.resize()
+      })
+
+      this.$watch('activeTab', () => {
+        this.$nextTick(() => {
+          chart.resize()
+        })
       })
     }
   }
@@ -246,19 +299,32 @@ export default {
 .stats-container {
   display: flex;
   margin-top: 20px;
+  min-height: 600px;
+  width: 100%;
 
   .chart-wrapper {
     flex: 1;
+    margin-right: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
+    width: calc(100% - 340px);
 
     .chart {
-      width: 100%;
-      height: 400px;
+      width: 100% !important;
+      height: 500px !important;
     }
   }
 
   .stats-info {
     width: 300px;
     margin-left: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
+    height: fit-content;
 
     .stats-item {
       margin-bottom: 15px;

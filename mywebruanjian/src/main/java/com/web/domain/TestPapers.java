@@ -50,6 +50,9 @@ public class TestPapers implements Serializable {
     private String totalScore;
 
     @TableField(exist = false)
+    private Integer newStatus;
+
+    @TableField(exist = false)
     private List<ExerciseQuestions> questions;
 
     @TableField(exist = false)

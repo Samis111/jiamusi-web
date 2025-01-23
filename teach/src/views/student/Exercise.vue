@@ -3,9 +3,9 @@
     <div class="filter-container">
       <el-input v-model="listQuery.keyword" placeholder="请输入练习标题" style="width: 200px;" class="filter-item"
         @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.type" placeholder="选择题目类型" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in exerciseTypes" :key="item.type_id" :label="item.type_name" :value="item.type_id" />
-      </el-select>
+        <!-- <el-select v-model="listQuery.type" placeholder="选择题目类型" clearable class="filter-item" style="width: 130px">
+          <el-option v-for="item in exerciseTypes" :key="item.type_id" :label="item.type_name" :value="item.type_id" />
+        </el-select> -->
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
@@ -16,15 +16,19 @@
       <el-table-column prop="paperNode" label="练习备注" min-width="200" show-overflow-tooltip />
       <el-table-column prop="status" label="状态" width="100">
         <template slot-scope="{row}">
-          <el-tag :type="row.answered ? 'success' : 'info'">
-            {{ row.answered ? '已完成' : '未完成' }}
+          <el-tag :type="getStatusType(row.status)">
+            {{ getStatusText(row.status) }}
           </el-tag>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="150" fixed="right">
         <template slot-scope="{row}">
-          <el-button type="text" @click="handleAnswer(row)">
-            {{ row.answered ? '查看答案' : '开始答题' }}
+          <el-button 
+            type="text" 
+            @click="handleAnswer(row)"
+            :disabled="!canTakeExercise(row)"
+          >
+            {{ getActionText(row) }}
           </el-button>
         </template>
       </el-table-column>
@@ -129,13 +133,42 @@ export default {
     this.getList()
   },
   methods: {
-    getStatusText(status) {
+    getStatusType(status) {
       const statusMap = {
-        0: '未开始',
-        1: '进行中',
-        2: '已结束'
+        0: 'success', // 开始
+        1: 'info'     // 结束
       }
       return statusMap[status]
+    },
+    getStatusText(status) {
+      const statusMap = {
+        0: '进行中',
+        1: '已结束'
+      }
+      return statusMap[status]
+    },
+    getActionText(row) {
+      // 根据 newStatus 判断显示文本
+      if (row.newStatus === 1) {
+        return '查看成绩'
+      }
+      // 根据练习状态判断
+      if (row.status === 0) {
+        return row.newStatus === 0 ? '开始答题' : '查看成绩'
+      }
+      return '已结束'
+    },
+    canTakeExercise(row) {
+      // 如果已结束，禁用按钮
+      if (row.status === 1) {
+        return false
+      }
+      // 如果是查看成绩状态，允许点击
+      if (row.newStatus === 1) {
+        return true
+      }
+      // 如果是进行中且未答题，允许点击
+      return row.status === 0 && row.newStatus === 0
     },
     getExerciseTypeName(typeId) {
       const type = this.exerciseTypes.find(t => t.type_id === typeId)
@@ -156,13 +189,11 @@ export default {
       this.getList()
     },
     handleAnswer(row) {
-      if (row.answered) {
-        // 查看答题详情
-        this.currentExercise = row
-        this.dialogTitle = '答题详情'
-        this.dialogVisible = true
+      if (row.newStatus === 1) {
+        // 查看成绩
+        this.showExerciseResult(row.paperId)
       } else {
-        // 跳转到答题页面
+        // 开始答题
         this.$router.push(`/student/exercise/answer/${row.paperId}`)
       }
     },

@@ -101,7 +101,8 @@ export default {
       listQuery: {
         page: 1,
         limit: 10,
-        keyword: ''
+        keyword: '',
+        userId: JSON.parse(localStorage.getItem('userInfo')).userId
       },
       dialogVisible: false,
       currentTest: null,
@@ -121,28 +122,40 @@ export default {
   methods: {
     getStatusType(status) {
       const statusMap = {
-        0: 'info',    // 未开始
-        1: 'success', // 进行中
-        2: 'warning'  // 已结束
+        0: 'success', // 开始
+        1: 'info'     // 结束
       }
       return statusMap[status]
     },
     getStatusText(status) {
       const statusMap = {
-        0: '未开始',
-        1: '进行中',
-        2: '已结束'
+        0: '进行中',
+        1: '已结束'
       }
       return statusMap[status]
     },
     getActionText(row) {
-      if (row.submitted) return '查看详情'
-      if (row.status === 1) return '开始考试'
-      if (row.status === 0) return '未开始'
+      // 根据 newStatus 判断显示文本
+      if (row.newStatus === 1) {
+        return '查看成绩'
+      }
+      // 根据试卷状态判断
+      if (row.status === 0) {
+        return row.newStatus === 0 ? '开始答题' : '查看成绩'
+      }
       return '已结束'
     },
     canTakeTest(row) {
-      return row.submitted || row.status === 0
+      // 如果已结束，禁用按钮
+      if (row.status === 1) {
+        return false
+      }
+      // 如果是查看成绩状态，允许点击
+      if (row.newStatus === 1) {
+        return true
+      }
+      // 如果是进行中且未答题，允许点击
+      return row.status === 0 && row.newStatus === 0
     },
     getList() {
       this.listLoading = true
@@ -158,11 +171,11 @@ export default {
       this.getList()
     },
     handleTest(row) {
-      console.log(row)
-
-      if (row.submitted) {
+      if (row.newStatus === 1) {
+        // 查看成绩
         this.showTestResult(row.paperId)
       } else {
+        // 开始答题
         this.$router.push(`/student/test/answer/${row.paperId}`)
       }
     },

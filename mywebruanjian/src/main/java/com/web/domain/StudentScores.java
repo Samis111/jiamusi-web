@@ -36,7 +36,7 @@ public class StudentScores implements Serializable {
     /**
      * 
      */
-    private Integer totalScore;
+    private String totalScore;
 
     /**
      * 

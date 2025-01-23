@@ -102,7 +102,7 @@ export default {
       dialogStatus: '',
       dialogTitle: '',
       roleOptions: [
-        { value: 'admin', label: '管理员' },
+        // { value: 'admin', label: '管理员' },
         { value: 'teacher', label: '教师' },
         { value: 'student', label: '学生' }
       ],
@@ -131,7 +131,7 @@ export default {
   methods: {
     getRoleName(role) {
       const roleMap = {
-        admin: '管理员',
+        // admin: '管理员',
         teacher: '教师',
         student: '学生'
       }
