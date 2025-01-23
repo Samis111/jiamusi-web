@@ -195,6 +195,7 @@ export default {
         { type_id: 4, type_name: '解答题' }
       ],
       answersVisible: false,
+      answersVisible1: false,
       currentAnswers: null,
       temp: {},
       rules: {
