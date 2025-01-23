@@ -72,7 +72,7 @@
         <el-table-column prop="questionCount" label="分值" width="80" align="center" />
         <el-table-column label="操作" width="150" align="center">
           <template slot-scope="{row}">
-            <el-button type="text" @click="handleEditQuestion(row)">编辑</el-button>
+            <!-- <el-button type="text" @click="handleEditQuestion(row)">编辑</el-button> -->
             <el-button type="text" @click="handleDeleteQuestion(row)">删除</el-button>
           </template>
         </el-table-column>

@@ -24,7 +24,7 @@
           <el-button type="text" @click="handleAddQuestion(row)">添加题目</el-button>
           <el-button type="text" @click="handleQuestionList(row)">题目列表</el-button>
           <el-button type="text" @click="handleEdit(row)">编辑</el-button>
-          <el-button type="text" @click="handlePublish(row)">{{ row.status === 1 ? '取消发布' : '发布' }}</el-button>
+          <!-- <el-button type="text" @click="handlePublish(row)">{{ row.status === 1 ? '取消发布' : '发布' }}</el-button> -->
           <el-button type="text" @click="handleDelete(row)">删除</el-button>
         </template>
       </el-table-column>
@@ -41,15 +41,19 @@
         <el-form-item label="试卷说明" prop="paperNode">
           <el-input type="textarea" v-model="temp.paperNode" :rows="3" placeholder="请输入试卷说明" />
         </el-form-item>
-        <el-form-item label="考试时长" prop="duration">
+        <!-- <el-form-item label="考试时长" prop="duration">
           <el-input-number v-model="temp.duration" :min="30" :max="180" :step="30" />
           <span class="unit">分钟</span>
+        </el-form-item> -->
+        <el-form-item label="总分" prop="totalScore">
+          <el-input-number v-model="temp.totalScore" :min="0" :max="100" :step="1" />
+          <span class="unit">分</span>
         </el-form-item>
         <el-form-item label="开始时间" prop="starttime">
-          <el-date-picker v-model="temp.starttime" type="datetime" placeholder="选择开始时间" />
+          <el-date-picker v-model="temp.starttime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择开始时间" />
         </el-form-item>
         <el-form-item label="结束时间" prop="endtime">
-          <el-date-picker v-model="temp.endtime" type="datetime" placeholder="选择结束时间" />
+          <el-date-picker v-model="temp.endtime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择结束时间" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -67,10 +71,12 @@
             {{ getTypeName(row.questionTypeId) }}
           </template>
         </el-table-column>
+        <el-table-column prop="questionAnswer" label="答案" width="100" />
+
         <el-table-column prop="questionCount" label="分值" width="80" align="center" />
         <el-table-column label="操作" width="150" align="center">
           <template slot-scope="{row}">
-            <el-button type="text" @click="handleEditQuestion(row)">编辑</el-button>
+            <!-- <el-button type="text" @click="handleEditQuestion(row)">编辑</el-button> -->
             <el-button type="text" @click="handleDeleteQuestion(row)">删除</el-button>
           </template>
         </el-table-column>
@@ -190,7 +196,7 @@ export default {
       dialogTitle: '',
       exerciseTypes: [
         { type_id: 1, type_name: '单选题' },
-        { type_id: 2, type_name: '多选题' },
+        // { type_id: 2, type_name: '多选题' },
         { type_id: 3, type_name: '填空题' },
         { type_id: 4, type_name: '解答题' }
       ],
@@ -199,21 +205,23 @@ export default {
       answerDetailVisible: false,
       answerDetail: null,
       temp: {
-        id: undefined,
+        paperCreatorId: JSON.parse(localStorage.getItem('userInfo')).userId,
         paperName: '',
         type: undefined,
         starttime: '',
         endtime: '',
-        duration: 90,
+        // duration: 90,
+        totalScore: 0,
         questions: [],
         status: 0
       },
       questions: [],
       rules: {
-        paper_name: [{ required: true, message: '请输入试卷名称', trigger: 'blur' }],
+        paperName: [{ required: true, message: '请输入试卷名称', trigger: 'blur' }],
         type: [{ required: true, message: '请选择题目类型', trigger: 'change' }],
-        startTime: [{ required: true, message: '请选择开始时间', trigger: 'change' }],
-        duration: [{ required: true, message: '请设置考试时长', trigger: 'blur' }]
+        starttime: [{ required: true, message: '请选择开始时间', trigger: 'change' }],
+        // duration: [{ required: true, message: '请设置考试时长', trigger: 'blur' }]
+        totalScore: [{ required: true, message: '请设置总分', trigger: 'blur' }]
       },
       currentPaper: null,
       questionListVisible: false,
@@ -284,12 +292,14 @@ export default {
     },
     handleCreate() {
       this.temp = {
-        id: undefined,
-        paper_name: '',
+        paperCreatorId: JSON.parse(localStorage.getItem('userInfo')).userId,
+        paperName: '',
         type: undefined,
-        startTime: '',
-        duration: 90,
-        questions: [],
+        starttime: '',
+        endtime: '',
+          // duration: 90,
+          totalScore: 0,
+          questions: [],
         status: 0
       }
       this.dialogStatus = 'create'
@@ -326,7 +336,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteTest(row.id).then(() => {
+        deleteTest(row.paperId).then(() => {
           Message.success('删除成功')
           this.getList()
         })

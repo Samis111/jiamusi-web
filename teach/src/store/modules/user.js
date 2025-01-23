@@ -11,13 +11,17 @@ const mutations = {
   
   SET_USER_INFO: (state, userInfo) => {
     state.userInfo = userInfo
-    localStorage.setItem('userInfo', userInfo)
+    console.log(userInfo);
+    // 将userInfo转换为JSON字符串
+    const userInfoJson = JSON.stringify(userInfo);
+    localStorage.setItem('userInfo', userInfoJson)
   },
   CLEAR_USER: (state) => {
     state.userInfo = {
       role: '',
       username: ''
     }
+    // 删除localStorage中的userInfo
     localStorage.removeItem('userInfo')
   }
 }

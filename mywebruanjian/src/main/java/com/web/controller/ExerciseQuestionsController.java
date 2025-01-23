@@ -104,7 +104,7 @@ public class ExerciseQuestionsController {
             questions.setQuestionCount(exerciseQuestions.getScore());
             questions.setQuestionCreatorId(exerciseQuestions.getQuestionCreatorId());
             List<Options> options = exerciseQuestions.getOptions();
-            String s = appendOptions(options, questions.getQuestionAnswer());
+            String s = appendOptions(options, exerciseQuestions.getAnswer());
             questions.setQuestionAnswer(s);
             questions.setNewquestionId(exerciseQuestions.getNewquestionId());
             boolean save = exerciseQuestionsService.save(questions);
@@ -119,8 +119,8 @@ public class ExerciseQuestionsController {
 
 
             questions.setQuestionCreatorId(exerciseQuestions.getQuestionCreatorId());
+            questions.setQuestionAnswer(exerciseQuestions.getAnswer());
 
-            questions.setQuestionAnswer(null);
             questions.setNewquestionId(exerciseQuestions.getNewquestionId());
             boolean save = exerciseQuestionsService.save(questions);
 

@@ -26,6 +26,7 @@ public class StudentRepliesAndTopics {
     private Integer number;
     private String status;
 
+    private String creator;
 
     private List<DiscussionReplies> replies;
 
@@ -36,6 +37,7 @@ public class StudentRepliesAndTopics {
         this.topicCreateTime = discussionTopics.getTopicCreateTime();
         this.number = discussionTopics.getNumber();
         this.status = discussionTopics.getStatus();
+        this.creator=discussionTopics.getCreator();
         this.replies = replies;
     }
 }

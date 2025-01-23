@@ -32,6 +32,13 @@ export function deleteInteraction(id) {
   })
 }
 
+export function getInteractionDetail(id) {
+  return request({
+    url: `/interaction/detail/${id}`,
+    method: 'get'
+  })
+}
+
 // 课件管理
 export function getCoursewareList(params) {
   return request({
@@ -171,7 +178,7 @@ export function createTest(data) {
 export function updateTest(data) {
   return request({
     url: '/teaching/test/update',
-    method: 'put',
+    method: 'post',
     data
   })
 }
@@ -189,7 +196,7 @@ export function updateTest(data) {
 export function deleteTest(id) {
   return request({
     url: `/teaching/test/delete/${id}`,
-    method: 'delete'
+    method: 'post'
   })
 }
 

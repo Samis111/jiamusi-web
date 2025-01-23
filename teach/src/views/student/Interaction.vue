@@ -3,23 +3,17 @@
     <div class="filter-container">
       <el-input v-model="listQuery.keyword" placeholder="请输入标题关键字" style="width: 200px;" class="filter-item"
         @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.type" placeholder="选择类型" clearable class="filter-item" style="width: 130px">
-        <el-option label="讨论" value="discussion" />
-        <el-option label="答疑" value="qa" />
-      </el-select>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
-      <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="handleCreate">
-        {{ listQuery.type === 'qa' ? '提问' : '发起讨论' }}
-      </el-button>
+      
     </div>
 
     <el-table :data="list" border style="width: 100%" v-loading="listLoading">
       <el-table-column prop="topicTitle" label="标题" min-width="200" show-overflow-tooltip />
       <el-table-column prop="type" label="类型" width="100">
         <template slot-scope="{row}">
-          {{ row.type === 'discussion' ? '讨论' : '答疑' }}
+          讨论
         </template>
       </el-table-column>
       <el-table-column prop="creator" label="发起人" width="120" />
@@ -60,15 +54,15 @@
           </p>
         </div>
         <div class="detail-content">
-          {{ detail.number }}
+          回复的数量：{{ detail.number }}
         </div>
         <div class="reply-list">
           <div v-for="(reply, index) in detail.replies" :key="index" class="reply-item">
             <p class="reply-info">
-              <span>{{ reply.creator }}</span>
-              <span>{{ reply.createTime }}</span>
+              <span>学生名字：{{ reply.username }}</span>
+              <span>回复时间：{{ reply.replyCreateTime }}</span>
             </p>
-            <div class="reply-content">{{ reply.content }}</div>
+            <div class="reply-content">回复内容：{{ reply.replyContent }}</div>
           </div>
         </div>
         <div class="reply-form">

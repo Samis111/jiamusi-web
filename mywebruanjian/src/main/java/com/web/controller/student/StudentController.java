@@ -49,6 +49,7 @@ public class StudentController {
     @GetMapping("/interaction/list")
     public Result<List<DiscussionTopics>> interactionList(@RequestParam("keyword") String keyword) {
         QueryWrapper<DiscussionTopics> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like("topic_title", keyword);
         List<DiscussionTopics> list = discussionTopicsService.list(queryWrapper);
         for (DiscussionTopics discussionTopics : list) {
             UserInfo userInfoServiceById = userInfoService.getById(discussionTopics.getTopicCreatorId());
@@ -67,6 +68,11 @@ public class StudentController {
         QueryWrapper<DiscussionReplies> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("topic_id", id);
         List<DiscussionReplies> list = discussionRepliesService.list(queryWrapper);
+        byId.setNumber(list.size());
+        for (DiscussionReplies discussionReplies : list) {
+            UserInfo userInfoServiceById1 = userInfoService.getById(discussionReplies.getReplyCreatorId());
+            discussionReplies.setUsername(userInfoServiceById1.getUsername());
+        }
         StudentRepliesAndTopics studentRepliesAndTopics = new StudentRepliesAndTopics(byId, list);
 
         return Result.ok(studentRepliesAndTopics);

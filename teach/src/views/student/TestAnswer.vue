@@ -17,24 +17,24 @@
           <span class="question-score">{{ question.questionCount }}分</span>
         </div>
 
-        <div class="question-content">{{ question.questionContent }}</div>
+        <div class="question-content">问：{{ question.questionContent }}</div>
 
         <div class="answer-area">
           <!-- 单选题 -->
           <template v-if="question.questionTypeId === 1">
             <el-radio-group v-model="answers[index]">
               <el-radio 
-                v-for="option in question.options" 
-                :key="option.value"
-                :label="option.value"
+                v-for="(option, optionIndex) in getOptions(question.questionAnswer)" 
+                :key="optionIndex"
+                :label="option"
               >
-                {{ option.label }}
+                {{ option}}
               </el-radio>
             </el-radio-group>
           </template>
 
           <!-- 多选题 -->
-          <template v-if="question.questionTypeId === 2">
+          <!-- <template v-if="question.questionTypeId === 2">
             <el-checkbox-group v-model="answers[index]">
               <el-checkbox
                 v-for="option in question.options"
@@ -44,17 +44,14 @@
                 {{ option.label }}
               </el-checkbox>
             </el-checkbox-group>
-          </template>
+          </template> -->
 
           <!-- 填空题 -->
           <template v-if="question.questionTypeId === 3">
-            <div v-for="(blank, blankIndex) in question.blanks" :key="blankIndex" class="blank-item">
-              <span class="blank-label">填空{{ blankIndex + 1 }}:</span>
-              <el-input 
-                v-model="answers[index][blankIndex]"
-                placeholder="请输入答案"
-              />
-            </div>
+            <el-input 
+              v-model="answers[index]"
+              placeholder="请输入答案"
+            />
           </template>
 
           <!-- 解答题 -->
@@ -94,7 +91,7 @@ export default {
       remainingTime: '',
       exerciseTypes: [
         { type_id: 1, type_name: '单选题' },
-        { type_id: 2, type_name: '多选题' },
+        // { type_id: 2, type_name: '多选题' },
         { type_id: 3, type_name: '填空题' },
         { type_id: 4, type_name: '解答题' }
       ]
@@ -118,37 +115,57 @@ export default {
       getTestDetail(testId).then(res => {
         this.paper = res.data
         // 初始化答案数组
-        // this.answers = this.paper.questions.map(q => {
-        //   if (q.questionTypeId === 2) return [] // 多选题
-        //   if (q.questionTypeId === 3) return new Array(q.blanks?.length || 0).fill('') // 填空题
-        //   return '' // 单选题和解答题
-        // })
-
-
+        this.answers = new Array(this.paper.questions.length).fill('')
         this.startTimer()
       })
     },
     startTimer() {
       if (this.timer) clearInterval(this.timer)
 
-      const endTime = new Date(this.paper.endtime).getTime()
+      // 计算考试总时长（分钟）
+      const startTime = new Date(this.paper.paperCreateTime.replace(/-/g, '/')).getTime()
+      const endTime = new Date(this.paper.endtime.replace(/-/g, '/')).getTime()
+      const totalMinutes = Math.floor((endTime - startTime) / (1000 * 60))
+
+      // 计算已经过去的时间（分钟）
+      const now = new Date().getTime()
+      const elapsedMinutes = Math.floor((now - startTime) / (1000 * 60))
+
+      // 计算剩余时间（分钟）
+      let remainingMinutes = totalMinutes - elapsedMinutes
+
+      // 如果考试还没开始
+      if (now < startTime) {
+        this.remainingTime = '考试未开始'
+        return
+      }
+
+      // 如果考试已经结束
+      if (now > endTime) {
+        this.remainingTime = '考试已结束'
+        this.handleSubmit(true)
+        return
+      }
 
       this.timer = setInterval(() => {
-        const now = new Date().getTime()
-        const distance = endTime - now
-
-        if (distance < 0) {
+        if (remainingMinutes <= 0) {
           clearInterval(this.timer)
           this.handleSubmit(true)
           return
         }
 
-        const hours = Math.floor(distance / (1000 * 60 * 60))
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000)
+        // 将剩余分钟转换为小时:分钟格式
+        const hours = Math.floor(remainingMinutes / 60)
+        const minutes = remainingMinutes % 60
 
-        this.remainingTime = `${hours}:${minutes}:${seconds}`
-      }, 1000)
+        this.remainingTime = `${hours}小时${minutes}分钟`
+        remainingMinutes--
+      }, 60000) // 每分钟更新一次
+
+      // 立即显示第一次时间
+      const hours = Math.floor(remainingMinutes / 60)
+      const minutes = remainingMinutes % 60
+      this.remainingTime = `${hours}小时${minutes}分钟`
     },
     handleConfirmSubmit() {
       this.$confirm('确认提前交卷吗？', '提示', {
@@ -160,13 +177,34 @@ export default {
       })
     },
     handleSubmit(isTimeout = false) {
-      submitTestAnswer({
+      // 构造提交的答案数据
+      const submitData = {
         testId: this.$route.params.id,
-        answers: this.answers
-      }).then(() => {
+        answers: this.paper.questions.map((question, index) => ({
+          questionId: question.questionId,
+          answer: this.answers[index] || ''
+        }))
+      }
+
+      submitTestAnswer(submitData).then(() => {
         Message.success(isTimeout ? '考试时间到，已自动提交' : '提交成功')
         this.$router.push('/student/test')
       })
+    },
+    getOptions(answerStr) {
+      try {
+        // 解析字符串形如 "[=1,=2,=3][null]" 
+        const matches = answerStr.match(/\[(.*?)\]/g);
+        if (matches && matches.length > 0) {
+          // 取第一个中括号内的内容并分割成数组
+          const options = matches[0].slice(1, -1).split(',');
+          return options.map(opt => opt.trim()); // 去除空格
+        }
+        return [];
+      } catch (error) {
+        console.error('解析选项出错:', error);
+        return [];
+      }
     }
   }
 }

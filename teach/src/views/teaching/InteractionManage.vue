@@ -3,21 +3,16 @@
     <div class="filter-container">
       <el-input v-model="listQuery.keyword" placeholder="请输入标题关键字" style="width: 200px;" class="filter-item"
         @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.type" placeholder="选择类型" clearable class="filter-item" style="width: 130px">
-        <el-option label="讨论" value="1" />
-        <el-option label="答疑" value="2" />
-      </el-select>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
       <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="handleCreate">
-        {{ listQuery.type === '1' ? '新建答疑' : '新建讨论' }}
+        新建讨论
       </el-button>
     </div>
 
     <el-table :data="list" border style="width: 100%" v-loading="listLoading">
       <el-table-column prop="topicTitle" label="标题" />
-      <el-table-column prop="type" label="类型" show-overflow-tooltip />
       <el-table-column prop="topicCreatorId" label="创建者" />
       <el-table-column prop="topicCreateTime" label="创建时间" width="160" />
       <el-table-column prop="number" label="回复数" width="80" align="center" />
@@ -43,11 +38,8 @@
 
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible">
       <el-form ref="dataForm" :model="temp" label-width="100px" :rules="rules">
-        <el-form-item label="标题" prop="title">
-          <el-input v-model="temp.title" />
-        </el-form-item>
-        <el-form-item label="内容" prop="content">
-          <el-input type="textarea" v-model="temp.content" rows="4" />
+        <el-form-item label="标题" prop="topicTitle">
+          <el-input v-model="temp.topicTitle" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -61,7 +53,7 @@
     <el-dialog title="详情" :visible.sync="detailVisible" width="50%">
       <div v-if="detail">
         <div class="detail-header">
-          <h3>{{ detail.title }}</h3>
+          <h3>讨论的问题：{{ detail.topicTitle }}</h3>
           <p>
             <span>创建者: {{ detail.creator }}</span>
             <span style="margin-left: 20px">创建时间: {{ detail.createTime }}</span>
@@ -79,12 +71,6 @@
             <div class="reply-content">{{ reply.content }}</div>
           </div>
         </div>
-        <div class="reply-form">
-          <el-input type="textarea" v-model="replyContent" :rows="3" placeholder="请输入回复内容" />
-          <el-button type="primary" @click="handleReply" style="margin-top: 10px">
-            回复
-          </el-button>
-        </div>
       </div>
     </el-dialog>
   </div>
@@ -92,7 +78,7 @@
 
 <script>
 import Pagination from '@/components/Pagination'
-import { getInteractionList, createInteraction, updateInteraction, deleteInteraction } from '@/api/teaching'
+import { getInteractionList, createInteraction, updateInteraction, deleteInteraction, getInteractionDetail } from '@/api/teaching'
 import { Message } from 'element-ui'
 
 export default {
@@ -108,8 +94,7 @@ export default {
       listQuery: {
         page: 1,
         limit: 10,
-        keyword: '',
-        type: 'discussion'
+        keyword: ''
       },
       dialogVisible: false,
       dialogStatus: '',
@@ -119,18 +104,19 @@ export default {
       replyContent: '',
       temp: {
         id: undefined,
-        title: '',
-        content: '',
+        topicTitle: '',
         status: 1
       },
       rules: {
-        title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
+        topicTitle: [{ required: true, message: '请输入标题', trigger: 'blur' }],
         content: [{ required: true, message: '请输入内容', trigger: 'blur' }]
       }
     }
   },
   created() {
     this.getList()
+    console.log(JSON.parse(localStorage.getItem('userInfo')).userId)
+    
   },
   methods: {
     getList() {
@@ -152,33 +138,31 @@ export default {
     },
     handleCreate() {
       this.temp = {
-        id: undefined,
-        title: '',
-        content: '',
-        status: 1
+        // 获取用户信息
+        topicCreatorId: JSON.parse(localStorage.getItem('userInfo')).userId,
+        topicTitle: '',
+        status: 1,
       }
       this.dialogStatus = 'create'
-      this.dialogTitle = '新建交互'
+      this.dialogTitle = '新建讨论'
       this.dialogVisible = true
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row)
       this.dialogStatus = 'update'
-      this.dialogTitle = '编辑交互'
+      this.dialogTitle = '编辑讨论'
       this.dialogVisible = true
     },
     handleView(row) {
       this.detailVisible = true
-      this.detail = {
-        title: row.title,
-        creator: row.creator,
-        createTime: row.createTime,
-        content: row.content,
-        replies: []
-      }
+      // 获取讨论详情
+      getInteractionDetail(row.topicId).then(response => {
+        this.detail = response.data
+      })
+      
     },
     handleDelete(row) {
-      this.$confirm('确认删除该交互?', '提示', {
+      this.$confirm('确认删除该讨论?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -211,13 +195,7 @@ export default {
         }
       })
     },
-    handleReply() {
-      if (!this.replyContent) {
-        Message.warning('请输入回复内容')
-        return
-      }
-      this.replyContent = ''
-    }
+    
   }
 }
 </script>

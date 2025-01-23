@@ -44,6 +44,10 @@ public class DiscussionReplies implements Serializable {
      */
     private Integer topicId;
 
+
+    @TableField(exist = false)
+    private String username;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
