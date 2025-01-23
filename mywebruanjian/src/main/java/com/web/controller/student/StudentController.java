@@ -347,7 +347,7 @@ public class StudentController {
         scores.setPaperName(testPapersServiceById.getPaperName());
         scores.setStudentId(testPapersDTO.getUserId());
 
-        studentScoresService.save(scores);
+//        studentScoresService.save(scores);
 
 
         return Result.ok(chengji);

@@ -119,7 +119,7 @@ export default {
       },
       exerciseTypes: [
         { type_id: 1, type_name: '单选题' },
-        { type_id: 2, type_name: '多选题' },
+        // { type_id: 2, type_name: '多选题' },
         { type_id: 3, type_name: '填空题' },
         { type_id: 4, type_name: '解答题' }
       ],
