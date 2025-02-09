@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.web.domain.*;
 import com.web.domain.DTO.Options;
 import com.web.domain.DTO.StudentRepliesAndTopics;
+import com.web.domain.DTO.StudentTestPapers;
 import com.web.domain.DTO.TestPapersDTO;
 import com.web.domain.common.Result;
 import com.web.service.*;
@@ -39,14 +40,16 @@ public class StudentController {
     private StudentScoresService studentScoresService;
 
     @GetMapping("/exercise/list")
-    public Result<List<TestPapers>> exerciseList(@RequestParam("keyword") String keyword) {
-        QueryWrapper<TestPapers> queryWrapper = new QueryWrapper<>();
-        List<TestPapers> list = testPapersService.list(queryWrapper);
+    public Result<List<NewtextPapers>> exerciseList(@RequestParam("keyword") String keyword,@RequestParam("userId")Integer id) {
+
+
+//        List<StudentTestPapers> list = testPapersService.joinScores(id);
+        List<NewtextPapers> list = newtextPapersService.list();
         return Result.ok(list);
     }
 
     @GetMapping("/test/list")
-    public Result<List<TestPapers>> textList(@RequestParam("keyword") String keywor, @RequestParam("userId") Integer userId) {
+    public Result<List<TestPapers>> textList(@RequestParam("keyword") String keyword, @RequestParam("userId") Integer userId) {
         QueryWrapper<TestPapers> queryWrapper = new QueryWrapper<>();
         List<TestPapers> list = testPapersService.list(queryWrapper);
 
