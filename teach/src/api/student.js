@@ -197,9 +197,9 @@ export function submitTestAnswer(data) {
 }
 */
 
-export function getTestResult(id) {
+export function getTestResult(paperId, userId) {
   return request({
-    url: `/student/test/result/${id}`,
+    url: `/student/get/${paperId}/${userId}`,
     method: 'get'
   })
 }

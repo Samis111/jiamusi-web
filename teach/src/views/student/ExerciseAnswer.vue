@@ -77,10 +77,17 @@ export default {
         { type_id: 1, type_name: '单选题' },
         { type_id: 3, type_name: '填空题' },
         { type_id: 4, type_name: '解答题' }
-      ]
+      ],
+      isResult: false, // 是否是查看结果模式
+      score: 0 // 总分
     }
   },
   created() {
+    // 判断是否是查看结果模式
+    this.isResult = this.$route.query.type === 'result'
+    if (this.isResult) {
+      this.score = this.$route.query.score
+    }
     this.getDetail()
   },
   methods: {
@@ -127,7 +134,10 @@ export default {
 
       submitExerciseAnswer(submitData).then(() => {
         Message.success('提交成功')
+        // 提交成功后返回练习列表页
         this.$router.push('/student/exercise')
+      }).catch(() => {
+        Message.error('提交失败')
       })
     }
   }

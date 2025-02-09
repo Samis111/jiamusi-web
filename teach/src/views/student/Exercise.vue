@@ -98,7 +98,7 @@
 
 <script>
 import Pagination from '@/components/Pagination'
-import { getStudentExerciseList, submitExerciseAnswer } from '@/api/student'
+import { getStudentExerciseList, submitExerciseAnswer, getExerciseResult } from '@/api/student'
 import { Message } from 'element-ui'
 
 export default {
@@ -148,27 +148,14 @@ export default {
       return statusMap[status]
     },
     getActionText(row) {
-      // 根据 newStatus 判断显示文本
-      if (row.newStatus === 1) {
-        return '查看成绩'
-      }
-      // 根据练习状态判断
-      if (row.status === 0) {
-        return row.newStatus === 0 ? '开始答题' : '查看成绩'
-      }
-      return '已结束'
+      return '开始答题'
     },
     canTakeExercise(row) {
-      // 如果已结束，禁用按钮
-      if (row.status === 1) {
+      // 如果已结束或已答题，禁用按钮
+      if (row.status === 1 || row.newStatus === 1) {
         return false
       }
-      // 如果是查看成绩状态，允许点击
-      if (row.newStatus === 1) {
-        return true
-      }
-      // 如果是进行中且未答题，允许点击
-      return row.status === 0 && row.newStatus === 0
+      return true
     },
     getExerciseTypeName(typeId) {
       const type = this.exerciseTypes.find(t => t.type_id === typeId)
@@ -189,13 +176,11 @@ export default {
       this.getList()
     },
     handleAnswer(row) {
-      if (row.newStatus === 1) {
-        // 查看成绩
-        this.showExerciseResult(row.paperId)
-      } else {
-        // 开始答题
-        this.$router.push(`/student/exercise/answer/${row.paperId}`)
-      }
+      // 直接跳转到答题页面
+      this.$router.push({
+        path: `/student/exercise/answer/${row.id}`,
+        query: { type: 'answer' }
+      })
     },
     submitAnswer() {
       if (!this.answer) {

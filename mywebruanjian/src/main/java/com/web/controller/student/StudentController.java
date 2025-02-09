@@ -40,7 +40,7 @@ public class StudentController {
     private StudentScoresService studentScoresService;
 
     @GetMapping("/exercise/list")
-    public Result<List<NewtextPapers>> exerciseList(@RequestParam("keyword") String keyword,@RequestParam("userId")Integer id) {
+    public Result<List<NewtextPapers>> exerciseList(@RequestParam("keyword") String keyword) {
 
 
 //        List<StudentTestPapers> list = testPapersService.joinScores(id);
@@ -63,13 +63,13 @@ public class StudentController {
             queryWrapper1.eq("student_id", userId).eq("paper_id", paperId);
            try {
                StudentScores one = studentScoresService.list(queryWrapper1).get(0);
-               if (one == null) {
-                   testPapers.setNewStatus(0);
+               if (one != null) {
+                   testPapers.setNewStatus(1);
 
                }
            }catch (Exception e){
 
-                   testPapers.setNewStatus(1);
+                   testPapers.setNewStatus(0);
            }
 
         }
@@ -193,8 +193,8 @@ public class StudentController {
         TestPapers testPapersServiceById = testPapersService.getById(testPapersDTO.getPaperId());
 
         StudentScores scores = new StudentScores();
-        scores.setTotal(chengji+"");
-        scores.setTotalScore(testPapersServiceById.getTotalScore());
+//        scores.setTotal();
+        scores.setTotalScore(chengji+"");
         scores.setPaperId(testPapersServiceById.getPaperId());
         scores.setPaperName(testPapersServiceById.getPaperName());
         scores.setStudentId(testPapersDTO.getUserId());
@@ -347,16 +347,24 @@ public class StudentController {
 
 
         StudentScores scores = new StudentScores();
-        scores.setTotal(chengji+"");
-        scores.setTotalScore(testPapersServiceById.getTotalScore());
+//        scores.setTotal();
+        scores.setTotalScore(chengji+"");
         scores.setPaperId(testPapersServiceById.getPaperId());
         scores.setPaperName(testPapersServiceById.getPaperName());
         scores.setStudentId(testPapersDTO.getUserId());
 
-//        studentScoresService.save(scores);
+        studentScoresService.save(scores);
 
 
         return Result.ok(chengji);
     }
 
+
+    @GetMapping("/get/{paperId}/{userId}")
+    public Result get(@PathVariable("userId") Integer userId, @PathVariable("paperId") Integer paperId) {
+
+        StudentScores one = studentScoresService.getOne(new QueryWrapper<StudentScores>().eq("student_id", userId).eq("paper_id", paperId).last("limit 1"));
+        return Result.ok(one);
+
+    }
 }
