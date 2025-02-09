@@ -19,6 +19,7 @@ public class DiscussionTopicsController {
     private DiscussionTopicsService discussionTopicsService;
 
 
+
     @GetMapping("list")
     public Result<List<DiscussionTopics>> list(DiscussionTopics userInfo) {
         QueryWrapper<DiscussionTopics> queryWrapper = new QueryWrapper<>();

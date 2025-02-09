@@ -58,13 +58,16 @@ public class StudentController {
 
             QueryWrapper<StudentScores> queryWrapper1 = new QueryWrapper<>();
             queryWrapper1.eq("student_id", userId).eq("paper_id", paperId);
-            StudentScores one = studentScoresService.list(queryWrapper1).get(0);
-            if (one == null) {
-                testPapers.setNewStatus(0);
+           try {
+               StudentScores one = studentScoresService.list(queryWrapper1).get(0);
+               if (one == null) {
+                   testPapers.setNewStatus(0);
 
-            } else {
-                testPapers.setNewStatus(1);
-            }
+               }
+           }catch (Exception e){
+
+                   testPapers.setNewStatus(1);
+           }
 
         }
 
