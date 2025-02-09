@@ -18,13 +18,19 @@ public class DiscussionTopicsController {
     @Autowired
     private DiscussionTopicsService discussionTopicsService;
 
+    @GetMapping("detail/{id}")
+    public Result detail(@PathVariable("id") Integer id) {
 
+        DiscussionTopics byId = discussionTopicsService.getById(id);
+        return Result.ok(byId);
+
+    }
 
     @GetMapping("list")
     public Result<List<DiscussionTopics>> list(DiscussionTopics userInfo) {
         QueryWrapper<DiscussionTopics> queryWrapper = new QueryWrapper<>();
 
-        if (userInfo.getTopicCreatorId() != null && userInfo.getTopicCreatorId()!=0) {
+        if (userInfo.getTopicCreatorId() != null && userInfo.getTopicCreatorId() != 0) {
             queryWrapper.eq("reply_creator_id", userInfo.getTopicCreatorId());
         }
 
