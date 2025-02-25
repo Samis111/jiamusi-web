@@ -176,9 +176,12 @@ export default {
       this.getList()
     },
     handleAnswer(row) {
+
+      console.log(row)
+
       // 直接跳转到答题页面
       this.$router.push({
-        path: `/student/exercise/answer/${row.id}`,
+        path: `/student/exercise/answer/${row.paperCreatorId}`,
         query: { type: 'answer' }
       })
     },

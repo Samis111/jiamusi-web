@@ -54,7 +54,7 @@
     </div>
 
     <div class="action-bar">
-      <el-button type="primary" @click="handleSubmit">提交答案</el-button>
+      <el-button type="primary" @click="handleSubmit">提交答案1</el-button>
     </div>
   </div>
 </template>
@@ -132,8 +132,8 @@ export default {
         }))
       }
 
-      submitExerciseAnswer(submitData).then(() => {
-        Message.success('提交成功')
+      submitExerciseAnswer(submitData).then((res) => {
+        Message.success('提交成功:分值'+ res.data+'分')
         // 提交成功后返回练习列表页
         this.$router.push('/student/exercise')
       }).catch(() => {

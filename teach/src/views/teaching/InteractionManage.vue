@@ -55,20 +55,18 @@
         <div class="detail-header">
           <h3>讨论的问题：{{ detail.topicTitle }}</h3>
           <p>
-            <span>创建者: {{ detail.creator }}</span>
-            <span style="margin-left: 20px">创建时间: {{ detail.createTime }}</span>
+            <span>创建者: {{ detail.topicCreatorId }}</span>
+            <span style="margin-left: 20px">创建时间: {{ detail.topicCreateTime }}</span>
           </p>
         </div>
-        <div class="detail-content">
-          {{ detail.content }}
-        </div>
+        
         <div class="reply-list">
           <div v-for="(reply, index) in detail.replies" :key="index" class="reply-item">
             <p class="reply-info">
-              <span>{{ reply.creator }}</span>
-              <span>{{ reply.createTime }}</span>
+              <span>{{ reply.replyId }}</span>
+              <span>{{ reply.replyCreateTime }}</span>
             </p>
-            <div class="reply-content">{{ reply.content }}</div>
+            <div class="reply-content">{{ reply.replyContent }}</div>
           </div>
         </div>
       </div>

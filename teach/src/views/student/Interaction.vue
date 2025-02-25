@@ -18,7 +18,6 @@
       </el-table-column>
       <el-table-column prop="creator" label="发起人" width="120" />
       <el-table-column prop="topicCreateTime" label="发起时间" width="160" />
-      <el-table-column prop="number" label="回复数" width="80" align="center" />
       <el-table-column label="操作" width="100" fixed="right">
         <template slot-scope="{row}">
           <el-button type="text" @click="handleView(row)">查看</el-button>

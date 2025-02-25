@@ -35,13 +35,13 @@ const routes = [
             path: 'exercise',
             name: 'ExerciseManage',
             component: () => import('@/views/teaching/ExerciseManage'),
-            meta: { title: '在线练习管理' }
+            meta: { title: '练习管理' }
           },
           {
             path: 'test',
             name: 'TestManage',
             component: () => import('@/views/teaching/TestManage'),
-            meta: { title: '测试管理' }
+            meta: { title: '在线测试' }
           },
           {
             path: 'score',

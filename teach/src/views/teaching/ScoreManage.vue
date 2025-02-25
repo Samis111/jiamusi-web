@@ -9,9 +9,7 @@
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
-      <el-button class="filter-item" type="success" icon="el-icon-download" @click="handleExport">
-        导出成绩
-      </el-button>
+
     </div>
 
     <el-tabs v-model="activeTab" @tab-click="handleTabClick">
@@ -229,7 +227,7 @@ export default {
         width: 'auto',
         height: 500
       })
-      
+
       this.$nextTick(() => {
         chart.resize()
       })
@@ -308,7 +306,7 @@ export default {
     background: #fff;
     padding: 20px;
     border-radius: 4px;
-    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
     width: calc(100% - 340px);
 
     .chart {
@@ -323,7 +321,7 @@ export default {
     background: #fff;
     padding: 20px;
     border-radius: 4px;
-    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
     height: fit-content;
 
     .stats-item {

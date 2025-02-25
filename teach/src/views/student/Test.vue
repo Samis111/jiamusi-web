@@ -14,8 +14,8 @@
       <el-table-column prop="endtime" label="结束时间" width="160" />
       <el-table-column prop="status" label="状态" width="100">
         <template slot-scope="{row}">
-          <el-tag :type="getStatusType(row.status)">
-            {{ getStatusText(row.status) }}
+          <el-tag :type="getStatusType(row)">
+            {{ getStatusText(row) }}
           </el-tag>
         </template>
       </el-table-column>
@@ -26,11 +26,7 @@
       </el-table-column>
       <el-table-column label="操作" width="150" fixed="right">
         <template slot-scope="{row}">
-          <el-button 
-            type="text" 
-            @click="handleTest(row)"
-            :disabled="!canTakeTest(row)"
-          >
+          <el-button type="text" @click="handleTest(row)" :disabled="!canTakeTest(row)">
             {{ getActionText(row) }}
           </el-button>
         </template>
@@ -71,7 +67,8 @@ export default {
         userId: JSON.parse(localStorage.getItem('userInfo')).userId
       },
       dialogVisible: false,
-      resultData: null
+      resultData: null,
+      currentTime: new Date().getTime(),
     }
   },
   created() {
@@ -83,24 +80,39 @@ export default {
         0: 'success', // 开始
         1: 'info'     // 结束
       }
-      return statusMap[status]
+      return statusMap[status.status]
     },
     getStatusText(status) {
       const statusMap = {
         0: '进行中',
         1: '已结束'
       }
-      return statusMap[status]
+
+      if (this.currentTime > new Date(status.endtime).getTime()) {
+        return statusMap[1]
+      }
+
+  
+      return statusMap[status.status]
     },
+  
     getActionText(row) {
+      console.log(row)
       // 如果已答题，显示查看分数
       if (row.newStatus === 1) {
         return '查看分数'
       }
+
+
+
       // 否则显示开始答题
       return '开始测试'
     },
     canTakeTest(row) {
+
+      // if (this.currentTime > new Date(row.endtime).getTime()) {
+      //   return false
+      // }
       // 如果已结束，禁用按钮
       if (row.status === 1) {
         return false

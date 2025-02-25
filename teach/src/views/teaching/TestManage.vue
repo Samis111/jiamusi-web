@@ -155,7 +155,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="handleQuestionDialogClose">取消</el-button>
-        <el-button type="primary" @click="createQuestion">确认</el-button>
+        <el-button type="primary" @click="submitQuestion">确认</el-button>
       </div>
     </el-dialog>
   </div>

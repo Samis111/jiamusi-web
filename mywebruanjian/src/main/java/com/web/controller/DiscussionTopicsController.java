@@ -1,13 +1,19 @@
 package com.web.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.web.domain.DTO.StudentRepliesAndTopics;
+import com.web.domain.DiscussionReplies;
 import com.web.domain.DiscussionTopics;
 
+import com.web.domain.UserInfo;
 import com.web.domain.common.Result;
+import com.web.service.DiscussionRepliesService;
 import com.web.service.DiscussionTopicsService;
+import com.web.service.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -18,11 +24,32 @@ public class DiscussionTopicsController {
     @Autowired
     private DiscussionTopicsService discussionTopicsService;
 
+    @Autowired
+    private DiscussionRepliesService discussionRepliesService;
+
+    @Autowired
+    private UserInfoService userInfoService;
+
     @GetMapping("detail/{id}")
     public Result detail(@PathVariable("id") Integer id) {
 
         DiscussionTopics byId = discussionTopicsService.getById(id);
-        return Result.ok(byId);
+
+
+        QueryWrapper<DiscussionReplies> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("topic_id", id);
+        List<DiscussionReplies> list = discussionRepliesService.list(queryWrapper);
+        byId.setNumber(list.size());
+        for (DiscussionReplies discussionReplies : list) {
+            UserInfo userInfoServiceById1 = userInfoService.getById(discussionReplies.getReplyCreatorId());
+            discussionReplies.setUsername(userInfoServiceById1.getUsername());
+        }
+        StudentRepliesAndTopics studentRepliesAndTopics = new StudentRepliesAndTopics(byId, list);
+
+
+
+
+        return Result.ok(studentRepliesAndTopics);
 
     }
 
@@ -47,7 +74,7 @@ public class DiscussionTopicsController {
 
     @PostMapping("create")
     public Result<?> save(@RequestBody DiscussionTopics userInfo) {
-
+        userInfo.setTopicCreateTime(new Date());
         boolean save = discussionTopicsService.save(userInfo);
         return Result.ok();
     }

@@ -1,5 +1,7 @@
 package com.web.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.web.domain.StudentScores;
 import com.web.domain.common.Result;
 import com.web.service.StudentScoresService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,9 @@ public class echartsController {
         integerIntegerHashMap.put(70,60);
         integerIntegerHashMap.put(60,0);
         ArrayList<Integer> integers = new ArrayList<>();
+
+//        studentScoresService.list(new QueryWrapper<StudentScores>().eq("paper_id",paperId)).var;
+
         for (Integer key : integerIntegerHashMap.keySet()) {
 
             Integer i = integerIntegerHashMap.get(key);

@@ -236,9 +236,9 @@ public class StudentController {
 
         QueryWrapper<ExerciseQuestions> queryWrapper = new QueryWrapper<>();
 
-        queryWrapper.eq("question_creator_id", id);
+        queryWrapper.eq("newquestion_id", id);
 
-        NewtextPapers testPapersServiceById = newtextPapersService.getById(id);
+        NewtextPapers testPapersServiceById = newtextPapersService.getOne(new QueryWrapper<NewtextPapers>().eq("paper_creator_id",id));
 
         List<ExerciseQuestions> list = exerciseQuestionsService.list(queryWrapper);
 
@@ -353,7 +353,7 @@ public class StudentController {
         scores.setPaperName(testPapersServiceById.getPaperName());
         scores.setStudentId(testPapersDTO.getUserId());
 
-        studentScoresService.save(scores);
+//        studentScoresService.save(scores);
 
 
         return Result.ok(chengji);
