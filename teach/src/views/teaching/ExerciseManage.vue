@@ -23,7 +23,7 @@
             {{ row.status === 1 ? '已发布' : '草稿' }}
           </el-tag>
         </template>
-      </el-table-column> -->
+</el-table-column> -->
       <el-table-column label="操作" width="300" fixed="right">
         <template slot-scope="{row}">
           <el-button type="text" @click="handleAddQuestion(row)">添加题目</el-button>
@@ -46,10 +46,12 @@
           <el-input type="textarea" v-model="temp.paperNode" :rows="3" placeholder="请输入试卷说明" />
         </el-form-item>
         <el-form-item label="开始时间" prop="startTime">
-          <el-date-picker v-model="temp.startTime" type="datetime"  value-format="yyyy-MM-dd HH:mm:ss"  placeholder="选择开始时间" />
+          <el-date-picker v-model="temp.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="选择开始时间" />
         </el-form-item>
         <el-form-item label="结束时间" prop="endTime">
-          <el-date-picker v-model="temp.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择结束时间" />
+          <el-date-picker v-model="temp.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="选择结束时间" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -151,7 +153,7 @@
       </div>
     </el-dialog>
 
-    
+
   </div>
 </template>
 
@@ -161,7 +163,7 @@ import {
   getExerciseList,
   createExercise,
   updateExercise,
-  deleteExercise,
+  newdeleteExercise,
   publishExercise,
   addExerciseQuestion,
   getExerciseQuestions,
@@ -190,7 +192,7 @@ export default {
       dialogStatus: '',
       dialogTitle: '',
       exerciseTypes: [
-      { type_id: 1, type_name: '单选题' },
+        { type_id: 1, type_name: '单选题' },
         { type_id: 3, type_name: '填空题' },
         { type_id: 4, type_name: '解答题' }
       ],
@@ -288,7 +290,8 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteExercise(row.questionId).then(() => {
+        // 
+        newdeleteExercise(row.paperCreatorId).then(() => {
           Message.success('删除成功')
           this.getList()
         })
@@ -399,7 +402,7 @@ export default {
           this.temp.paperCreatorId = user.userId;
 
           console.log(this.temp);
-          
+
 
           createExercise(this.temp).then(() => {
             this.dialogVisible = false

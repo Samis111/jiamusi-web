@@ -22,11 +22,8 @@
           <!-- 单选题 -->
           <template v-if="question.questionTypeId === 1">
             <el-radio-group v-model="answers[index]">
-              <el-radio 
-                v-for="(option, optionIndex) in getOptions(question.questionAnswer)" 
-                :key="optionIndex"
-                :label="getOptionLabel(optionIndex)"
-              >
+              <el-radio v-for="(option, optionIndex) in getOptions(question.questionAnswer)" :key="optionIndex"
+                :label="getOptionLabel(optionIndex)">
                 {{ getOptionLabel(optionIndex) }}. {{ option }}
               </el-radio>
             </el-radio-group>
@@ -34,20 +31,12 @@
 
           <!-- 填空题 -->
           <template v-if="question.questionTypeId === 3">
-            <el-input 
-              v-model="answers[index]"
-              placeholder="请输入答案"
-            />
+            <el-input v-model="answers[index]" placeholder="请输入答案" />
           </template>
 
           <!-- 解答题 -->
           <template v-if="question.questionTypeId === 4">
-            <el-input
-              type="textarea"
-              v-model="answers[index]"
-              :rows="6"
-              placeholder="请输入答案"
-            />
+            <el-input type="textarea" v-model="answers[index]" :rows="6" placeholder="请输入答案" />
           </template>
         </div>
       </div>
@@ -100,7 +89,7 @@ export default {
       getExerciseDetail(exerciseId).then(res => {
         this.paper = res.data
         // 初始化答案数组
-        this.answers = new Array(this.paper.questions.length).fill('')
+        this.answers = new Array(this.paper.questions)
       })
     },
     getOptionLabel(index) {
@@ -133,7 +122,7 @@ export default {
       }
 
       submitExerciseAnswer(submitData).then((res) => {
-        Message.success('提交成功:分值'+ res.data+'分')
+        Message.success('提交成功:分值' + res.data + '分')
         // 提交成功后返回练习列表页
         this.$router.push('/student/exercise')
       }).catch(() => {
@@ -207,7 +196,7 @@ export default {
 
         .el-radio {
           margin-left: 0 !important;
-          
+
           /deep/ .el-radio__label {
             white-space: normal;
             padding-left: 8px;
@@ -228,4 +217,4 @@ export default {
     }
   }
 }
-</style> 
+</style>

@@ -237,12 +237,12 @@ public class StudentController {
         QueryWrapper<ExerciseQuestions> queryWrapper = new QueryWrapper<>();
 
         queryWrapper.eq("newquestion_id", id);
-
-        NewtextPapers testPapersServiceById = newtextPapersService.getOne(new QueryWrapper<NewtextPapers>().eq("paper_creator_id",id));
+        QueryWrapper<NewtextPapers> paper_creator_id = new QueryWrapper<NewtextPapers>().eq("paper_creator_id", id);
+        List<NewtextPapers> testPapersServiceById = newtextPapersService.list(paper_creator_id);
 
         List<ExerciseQuestions> list = exerciseQuestionsService.list(queryWrapper);
 
-        testPapersServiceById.setQuestions(list);
+        testPapersServiceById.get(0).setQuestions(list);
 
         return Result.ok(testPapersServiceById);
     }

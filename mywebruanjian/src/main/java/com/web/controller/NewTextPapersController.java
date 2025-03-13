@@ -25,8 +25,6 @@ public class NewTextPapersController {
 
         QueryWrapper<NewtextPapers> queryWrapper = new QueryWrapper<>();
 
-
-
         List<NewtextPapers> list = newtextPapersService.list();
         return Result.ok(list);
     }
@@ -50,4 +48,11 @@ public class NewTextPapersController {
         boolean save = newtextPapersService.updateById(newtextPapers);
         return Result.ok();
     }
+
+    @PostMapping("del/{id}")
+    public Result del(@PathVariable("id")Integer id){
+        boolean save = newtextPapersService.removeById(id);
+        return Result.ok();
+    }
+
 }

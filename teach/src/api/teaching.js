@@ -106,6 +106,12 @@ export function deleteExercise(id) {
     method: 'delete'
   })
 }
+export function newdeleteExercise(id) {
+  return request({
+    url: `/NewTextPapers/del/${id}`,
+    method: 'post'
+  })
+}
 
 export function publishExercise(id) {
   return request({
