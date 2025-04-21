@@ -116,6 +116,9 @@ export default {
         this.paper = res.data
         // 初始化答案数组
         this.answers = new Array(this.paper.questions.length).fill('')
+
+       
+
         this.startTimer()
       })
     },

@@ -43,7 +43,7 @@
     </div>
 
     <div class="action-bar">
-      <el-button type="primary" @click="handleSubmit">提交答案1</el-button>
+      <el-button type="primary" @click="handleSubmit">提交答案</el-button>
     </div>
   </div>
 </template>
@@ -87,9 +87,17 @@ export default {
     getDetail() {
       const exerciseId = this.$route.params.id
       getExerciseDetail(exerciseId).then(res => {
-        this.paper = res.data
+
+        this.paper = res.data[0]
         // 初始化答案数组
-        this.answers = new Array(this.paper.questions)
+        console.log(this.paper.questions.length)
+        if (this.paper) {
+          this.answers = new Array(this.paper.questions.length).fill('')
+
+
+          console.log(this.answers)
+        }
+
       })
     },
     getOptionLabel(index) {
